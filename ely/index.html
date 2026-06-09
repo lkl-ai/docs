@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ely — the AI front desk for your hotel · by LOKAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3ECDC; --paper-2:#FBF6EC; --paper-3:#ECE3D0;
+  --wash-clay:#F4E5D6; --wash-sage:#E8EEE3; --wash-blue:#E4ECF1;
+  --text:#3C3322; --head:#2E2617; --muted:#8A7E68;
+  --accent:#C25A2E; --accent-deep:#9E431F; --accent-soft:#F1DCCD;
+  --gold:#BE9233; --gold-soft:#EFE2C2;
+  --sage:#5C7357; --teal:#2E6E66; --teal-soft:#D9E6E0;
+  --blue:#2F6E92; --blue-soft:#DCE7EE;
+  --line:#DFD4BF; --line-2:#E8DECB;
+  --font-display:'Fraunces','Georgia',serif;
+  --font-sans:'Inter','Helvetica Neue',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);background:#e7decb;color:var(--text);overflow:hidden;-webkit-font-smoothing:antialiased}
+.deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:clamp(30px,5vh,52px) clamp(40px,5.4vw,80px);background:var(--paper);opacity:0;visibility:hidden;transform:translateY(10px) scale(.995);transition:opacity .45s ease,transform .45s ease;overflow:hidden}
+.slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+.slide.clay{background:var(--wash-clay)}.slide.sage{background:var(--wash-sage)}.slide.blue{background:var(--wash-blue)}
+*::selection{background:var(--accent);color:#fff}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 100% 0%,rgba(190,146,51,.07),transparent 52%),radial-gradient(90% 70% at 0% 100%,rgba(92,115,87,.05),transparent 55%)}
+.slide::after{content:"";position:absolute;top:-58px;right:-44px;width:270px;height:270px;pointer-events:none;z-index:0;background-image:radial-gradient(var(--accent) 1.3px,transparent 1.7px);background-size:12px 12px;opacity:.3;-webkit-mask-image:radial-gradient(closest-side,#000 28%,transparent);mask-image:radial-gradient(closest-side,#000 28%,transparent)}
+.eyebrow{font-weight:600;font-size:clamp(10px,.92vw,13px);letter-spacing:.2em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:clamp(20px,2.6vw,38px);height:2px;background:var(--accent)}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.04;letter-spacing:-.015em;color:var(--head)}
+.slide-head{margin-bottom:clamp(10px,1.5vh,18px)}
+.slide-head h2{font-size:clamp(25px,3.4vw,45px);margin-top:11px}
+.subhead{font-size:clamp(13.5px,1.32vw,18px);color:var(--muted);margin-top:9px;max-width:80ch;line-height:1.45}
+.subhead b{color:var(--accent);font-weight:600}
+.lead{font-size:clamp(13.5px,1.3vw,17px);color:var(--text);max-width:60ch;line-height:1.5}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.body>.vizrow,.body>.report{flex:1;min-height:0}
+.body>.cols.fill{flex:1;min-height:0;align-items:stretch}
+.colcenter{display:flex;flex-direction:column;justify-content:center;height:100%;min-height:0}
+.accent{color:var(--accent)}.tealc{color:var(--teal)}em{font-style:italic}
+.cols{display:grid;gap:clamp(20px,3vw,46px);align-items:center}
+.cols.t6040{grid-template-columns:1.16fr .84fr}.cols.t5050{grid-template-columns:1fr 1fr}
+.foot{position:absolute;left:clamp(40px,5.4vw,80px);right:clamp(40px,5.4vw,80px);bottom:clamp(15px,2.3vh,22px);display:flex;justify-content:space-between;align-items:center;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);padding-top:9px}
+.foot .wm{font-family:var(--font-display);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:14px;color:var(--head)}
+.foot .wm b{color:var(--accent)}
+.nav{position:fixed;z-index:50;bottom:13px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:11px;background:rgba(46,38,23,.9);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 9px}
+.nav button{border:0;background:transparent;color:#F4EFE4;width:27px;height:27px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.nav button:hover{background:rgba(255,255,255,.16)}
+.nav .count{font-size:11px;letter-spacing:.1em;color:rgba(244,239,228,.85);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+.dots{display:flex;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:rgba(244,239,228,.34);cursor:pointer;transition:all .2s;display:block}.dots i.on{background:#E9A86B;transform:scale(1.35)}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:60;transition:width .45s ease;width:0}
+.hint{position:fixed;bottom:15px;right:15px;z-index:50;font-size:10px;letter-spacing:.06em;color:var(--muted);background:rgba(251,246,236,.7);padding:5px 10px;border-radius:8px;border:1px solid var(--line)}
+@media(max-width:820px){.dots{display:none}.hint{display:none}}
+.notes{position:fixed;left:0;right:0;bottom:0;z-index:55;background:rgba(46,38,23,.97);color:#F4EFE4;border-top:2px solid var(--accent);padding:15px 22px;transform:translateY(100%);transition:transform .3s;max-height:38vh;overflow:auto}
+.notes.show{transform:none}.notes h4{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#E9A86B;margin-bottom:7px}.notes p{font-size:14px;line-height:1.55;max-width:92ch}
+
+/* title */
+.t-top{display:flex;justify-content:space-between;align-items:center}
+.t-meta{display:flex;gap:24px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.t-meta b{color:var(--accent);font-weight:600}
+.t-hero{display:grid;grid-template-columns:1.04fr .96fr;gap:clamp(20px,3vw,48px);align-items:center;flex:1}
+.ely-word{font-family:var(--font-display);font-weight:600;font-size:clamp(72px,12vw,150px);line-height:.86;letter-spacing:-.03em;color:var(--head)}
+.ely-word .dot{color:var(--accent)}
+.t-by{font-weight:600;font-size:clamp(12px,1.15vw,15px);letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin:6px 0 18px 5px}
+.t-tag{font-family:var(--font-display);font-style:italic;font-weight:500;font-size:clamp(18px,2.3vw,32px);color:var(--head);letter-spacing:-.01em;margin-bottom:13px;max-width:18ch}
+.t-sub{font-size:clamp(13.5px,1.3vw,17.5px);color:var(--text);max-width:46ch;line-height:1.5}
+.hotelwrap{position:relative;height:clamp(280px,52vh,460px);display:flex;align-items:center;justify-content:center}
+canvas.ht{width:100%;height:100%;display:block}
+.hotel-cap{position:absolute;bottom:2px;right:6px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* icons + features */
+.ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.feat{display:flex;flex-direction:column;gap:clamp(12px,1.9vh,20px)}
+.fitem{display:flex;gap:15px;align-items:flex-start}
+.fic{flex:none;width:clamp(42px,3.4vw,52px);height:clamp(42px,3.4vw,52px);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,1.8vw,25px);background:var(--accent-soft);color:var(--accent-deep)}
+.fitem.teal .fic{background:var(--teal-soft);color:var(--teal)}.fitem.gold .fic{background:var(--gold-soft);color:#8a6a1f}.fitem.blue .fic{background:var(--blue-soft);color:var(--blue)}
+.fitem .ft{font-weight:600;font-size:clamp(15px,1.5vw,20px);color:var(--head);margin-bottom:2px}
+.fitem .fd{font-size:clamp(12.5px,1.25vw,15.5px);color:var(--muted);line-height:1.45;max-width:56ch}
+.sig{font-family:var(--font-display);font-style:italic;font-weight:500;font-size:clamp(17px,1.9vw,26px);color:var(--accent);margin-top:20px}
+
+/* stat panels */
+.vizrow{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,1.9vw,26px);align-items:center}
+.vpanel{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:clamp(20px,2.1vw,30px);display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 28px -22px rgba(60,40,20,.5);height:clamp(300px,54vh,440px)}
+.vpanel .vk{font-weight:700;font-size:clamp(13px,1.25vw,16px);color:var(--head)}
+.vmid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:0}
+.vn{font-family:var(--font-display);font-weight:600;font-size:clamp(40px,5.4vw,72px);line-height:.9;color:var(--accent);text-align:center;letter-spacing:-.02em}
+.vn .u{font-size:.48em}
+.vl{font-size:clamp(12.5px,1.2vw,15px);color:var(--text);line-height:1.45}
+.vs{font-size:10px;color:var(--muted);opacity:.8;margin-top:auto}
+
+/* combination diagram (slide 4) */
+.combo{display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2vh,20px)}
+.combo-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(12px,1.6vw,22px);width:100%}
+.engine{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,1.9vw,24px);display:flex;flex-direction:column;gap:7px;position:relative}
+.engine .ei{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:21px}
+.engine.a .ei{background:var(--teal-soft);color:var(--teal)}.engine.b .ei{background:var(--accent-soft);color:var(--accent-deep)}.engine.c .ei{background:var(--gold-soft);color:#8a6a1f}
+.engine .en{font-family:var(--font-display);font-weight:600;font-size:clamp(16px,1.6vw,21px);color:var(--head)}
+.engine .er{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.engine.a .er{color:var(--teal)}.engine.b .er{color:var(--accent)}.engine.c .er{color:#8a6a1f}
+.engine .ed{font-size:clamp(11.5px,1.15vw,14px);color:var(--muted);line-height:1.4}
+.combo .plus{font-family:var(--font-display);font-size:26px;color:var(--muted)}
+.eq{display:flex;align-items:center;gap:14px;background:var(--head);color:#fff;border-radius:16px;padding:clamp(14px,1.8vw,22px) clamp(20px,2.4vw,32px);width:100%}
+.eq .em{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3vw,42px);color:#fff;line-height:1}
+.eq .em .dot{color:#E9A86B}
+.eq .et{font-size:clamp(13px,1.3vw,16px);color:rgba(244,239,228,.82);line-height:1.4}
+
+/* channel + language chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.chip{display:flex;align-items:center;gap:9px;background:var(--paper-2);border:1px solid var(--line);border-radius:11px;padding:11px 16px;font-weight:600;font-size:clamp(13px,1.3vw,16px);color:var(--head);box-shadow:0 8px 20px -18px rgba(60,40,20,.5)}
+.chip .ci{width:24px;height:24px;border-radius:7px;background:var(--accent-soft);color:var(--accent-deep);display:flex;align-items:center;justify-content:center;font-size:13px}
+.chip.soon{opacity:.55}.chip.soon::after{content:"soon";font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-left:2px}
+.chip.live{border-color:var(--teal-soft)}.chip.live .ci{background:var(--teal-soft);color:var(--teal)}
+.chgrp{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.chgrp.live{color:var(--teal)}.chgrp.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.chgrp.avail{color:var(--muted);margin-top:clamp(16px,2.6vh,26px)}
+.langgrid{display:flex;flex-wrap:wrap;gap:9px;align-content:flex-start}
+.lchip{background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-weight:600;font-size:clamp(13px,1.35vw,17px);color:var(--head)}
+.lchip.more{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* example cards */
+.exgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.5vw,20px)}
+.excard{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:clamp(15px,1.8vw,22px);display:flex;flex-direction:column;gap:8px;text-align:center;align-items:center}
+.excard .exi{width:46px;height:46px;border-radius:12px;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:22px}
+.excard h4{font-family:var(--font-display);font-weight:600;font-size:clamp(14px,1.4vw,17px);color:var(--head)}
+.excard p{font-size:clamp(11px,1.1vw,13px);color:var(--muted);line-height:1.4}
+
+/* money bar */
+.money{background:var(--paper-2);border:1px solid var(--line);border-radius:15px;padding:clamp(15px,1.8vw,22px);margin-top:14px}
+.money h4{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:13px}
+.mbar{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mbar .ml{width:62px;font-weight:700;font-size:13px;flex:none}
+.mbar .track{flex:1;height:26px;border-radius:7px;overflow:hidden;display:flex;background:var(--paper-3)}
+.mseg{height:100%;display:block;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;line-height:26px;text-align:center}
+.mseg.keep{background:linear-gradient(90deg,#2E6E66,#3C8A7F)}
+.mseg.lose{background:repeating-linear-gradient(45deg,#C25A2E,#C25A2E 7px,#ad4f28 7px,#ad4f28 14px)}
+.mseg.fee{background:#cbb9a0;color:var(--head)}
+
+/* mega feature grid (slide: complete feature set) */
+.mega{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(11px,1.3vw,18px);flex:1;min-height:0}
+.pillar{background:var(--paper-2);border:1px solid var(--line);border-radius:13px;padding:clamp(13px,1.4vw,18px);display:flex;flex-direction:column;gap:7px;min-height:0}
+.pillar .ph{display:flex;align-items:center;gap:9px;margin-bottom:2px}
+.pillar .pi{width:28px;height:28px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--accent-soft);color:var(--accent-deep)}
+.pillar.t .pi{background:var(--teal-soft);color:var(--teal)}.pillar.g .pi{background:var(--gold-soft);color:#8a6a1f}.pillar.b .pi{background:var(--blue-soft);color:var(--blue)}
+.pillar h4{font-family:var(--font-display);font-weight:600;font-size:clamp(13px,1.3vw,16px);color:var(--head);line-height:1.05}
+.pillar ul{list-style:none;display:flex;flex-direction:column;gap:3px}
+.pillar li{font-size:clamp(10.5px,1.04vw,12.5px);color:var(--text);line-height:1.3;padding-left:13px;position:relative}
+.pillar li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.pillar.t li::before{background:var(--teal)}.pillar.g li::before{background:var(--gold)}.pillar.b li::before{background:var(--blue)}
+.secband{margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--head);color:#F4EFE4;border-radius:12px;padding:12px 20px;font-size:12px}
+.secband b{color:#E9A86B}
+.secband .si{font-weight:600;color:#fff}
+
+/* chat player */
+.chat{width:100%;max-width:clamp(256px,24vw,338px);height:clamp(360px,60vh,540px);background:#eef0f2;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line);box-shadow:0 24px 54px -26px rgba(60,40,20,.55),0 6px 16px -10px rgba(60,40,20,.3);position:relative}
+.chead{background:#fff;padding:11px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #ececec;flex:none}
+.chead .cback{color:#9aa0a6;font-size:16px;font-weight:600}
+.chead .ct{font-weight:600;font-size:13px;color:#15130f;display:flex;align-items:center;gap:6px}
+.chead .ct .od{width:8px;height:8px;border-radius:50%;background:#2bb673}
+.chead .cs{font-size:10px;color:#9aa0a6;margin-top:1px}
+.cbody{flex:1;overflow:hidden;padding:13px 12px;display:flex;flex-direction:column;gap:7px}
+.crow{display:flex;gap:7px;align-items:flex-end;max-width:100%;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+.crow.show{opacity:1;transform:none}.crow.guest{justify-content:flex-end}
+.cav{width:22px;height:22px;border-radius:50%;background:#bfe7d8;color:#1c7a5a;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.bub{max-width:80%;padding:9px 12px;border-radius:15px;font-size:12.5px;line-height:1.42}
+.bub.ely{background:#fff;color:#1f2937;border-bottom-left-radius:5px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.bub.guest{background:#1d9bf0;color:#fff;border-bottom-right-radius:5px}
+.bub .lnk{color:#1d6fd0;font-weight:700}.bub .fl{font-size:10px;color:#9aa0a6;display:block;margin-bottom:3px;font-weight:600}
+.typing{display:flex;gap:4px;padding:11px 13px;background:#fff;border-radius:15px;border-bottom-left-radius:5px;width:max-content;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.typing i{width:6px;height:6px;border-radius:50%;background:#c2c8ce;animation:td 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.cfoot{padding:9px 11px;background:#fff;border-top:1px solid #ececec;flex:none}.cfoot .inp{font-size:11.5px;color:#9aa0a6;background:#f1f3f5;border-radius:999px;padding:8px 13px}
+.creplay{position:absolute;top:9px;right:10px;z-index:6;font-size:10px;font-weight:600;color:#fff;background:rgba(46,38,23,.7);border:0;border-radius:999px;padding:5px 10px;cursor:pointer}
+.shotcap{font-size:11.5px;color:var(--muted);margin-top:9px;font-style:italic;font-family:var(--font-display);text-align:center}
+
+/* getting started timeline */
+.tl-rail{height:2px;background:linear-gradient(90deg,var(--accent),rgba(190,146,51,.3));margin:5px clamp(10px,1.4vw,20px) 0}
+.timeline{display:flex;flex-wrap:wrap}
+.tl{flex:1;min-width:150px;padding:0 clamp(10px,1.4vw,20px)}
+.tl .twk{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.tl .nd{width:13px;height:13px;border-radius:50%;background:var(--accent);margin:8px 0 11px;box-shadow:0 0 0 5px var(--accent-soft)}
+.tl .tt{font-family:var(--font-display);font-weight:600;font-size:clamp(15px,1.5vw,20px);color:var(--head);margin-bottom:5px}
+.tl .td{font-size:clamp(11.5px,1.12vw,14px);color:var(--muted);line-height:1.4}
+.ask-close{margin-top:clamp(16px,2.6vh,28px);font-family:var(--font-display);font-size:clamp(16px,1.7vw,24px);font-weight:500;color:var(--head);line-height:1.3}
+.ask-close b{color:var(--accent);font-weight:600}
+
+/* slide 7 — agent experience mock */
+.agentui{background:var(--paper-2);border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 22px 50px -28px rgba(60,40,20,.55);width:100%;max-width:clamp(340px,38vw,500px)}
+.au-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid var(--line)}
+.au-h-l{color:var(--muted);display:flex;align-items:center;gap:6px;font-size:11px}
+.au-ch{font-weight:600;color:var(--head)}.au-flag{font-weight:600;color:var(--head)}
+.au-status{color:var(--accent);font-weight:700;font-size:10px;white-space:nowrap}
+.au-grid{display:grid;grid-template-columns:1fr 1.06fr}
+.au-thread{padding:12px 10px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);background:#f4f5f7}
+.amsg{max-width:94%;padding:7px 10px;border-radius:11px;font-size:11px;line-height:1.35}
+.amsg.guest{background:#fff;color:#1f2937;align-self:flex-start;border:1px solid #ececec}
+.amsg.ely{background:#1d9bf0;color:#fff;align-self:flex-end}
+.au-handoff{align-self:center;font-size:9.5px;color:#7b828a;background:#e3e7ea;padding:3px 9px;border-radius:999px;margin-top:3px}
+.au-side{padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--paper-2)}
+.au-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.au-card.sum{border:1px solid #e9c9b6;border-left:3px solid var(--accent);background:var(--accent-soft)}
+.au-ct{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--accent-deep);margin-bottom:4px}
+.au-card p{font-size:11px;color:var(--text);line-height:1.42;margin:0}
+.au-trans{font-size:9.5px;color:var(--teal);font-weight:700;margin-top:6px}
+.au-tags{display:flex;gap:5px;flex-wrap:wrap}
+.au-tags span{font-size:9.5px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--paper-3);border:1px solid var(--line);color:var(--head)}
+/* ===== halftone dot accents (used across the deck) ===== */
+.hdots{position:absolute;pointer-events:none;z-index:0;background-image:radial-gradient(currentColor 1.3px,transparent 1.7px);background-size:12px 12px;color:var(--accent);opacity:.38;-webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent);mask-image:radial-gradient(closest-side,#000 30%,transparent)}
+.hdots.teal{color:var(--teal)}.hdots.gold{color:var(--gold)}.hdots.blue{color:var(--blue)}
+.hdots.tr{top:-70px;right:-50px;width:300px;height:300px}
+.hdots.br{bottom:-66px;right:-46px;width:280px;height:280px}
+.hdots.bl{bottom:-80px;left:-70px;width:320px;height:320px}
+.hdots.tl{top:-70px;left:-60px;width:280px;height:280px}
+.slide-head,.body,.t-hero,.t-top{position:relative;z-index:1}
+/* svg illustrations */
+.statill{height:clamp(50px,6.6vh,72px);width:auto;margin:0 auto 2px}
+.illus{display:block}
+/* slide 4 — merge (de-branded capability cards) */
+.engine .ed b{color:var(--head)}
+.mergeline{display:flex;align-items:center;justify-content:center;gap:11px;color:var(--accent);font-weight:700;font-size:13px;letter-spacing:.04em}
+.mergeline .ln{height:1px;width:46px;background:var(--accent);opacity:.4}
+/* slide 5 — channel hub */
+.hub{position:relative;width:100%;max-width:430px;margin:0 auto;aspect-ratio:1.18/1}
+.hub svg{width:100%;height:100%;overflow:visible}
+/* slide 9 — conversion flow + margin */
+.conv{display:flex;align-items:stretch;justify-content:space-between;gap:8px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,2vw,26px) clamp(12px,1.6vw,22px);margin-bottom:clamp(16px,2.4vh,24px)}
+.cnode{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;flex:1}
+.ci2{width:clamp(48px,4.6vw,64px);height:clamp(48px,4.6vw,64px);border-radius:50%;background:var(--accent-soft);color:var(--accent-deep);display:flex;align-items:center;justify-content:center;font-size:clamp(20px,1.9vw,26px)}
+.cnode.win .ci2{background:var(--teal);color:#fff}
+.ci2 svg{width:clamp(22px,2vw,28px);height:clamp(22px,2vw,28px);stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ct2{font-weight:600;font-size:clamp(13px,1.3vw,16px);color:var(--head)}.cd2{font-size:clamp(11px,1.1vw,13px);color:var(--muted);max-width:16ch;line-height:1.3}
+.cdash{flex:.5;border-top:2px dashed var(--accent);opacity:.45;align-self:center;margin-top:-28px}
+.margin{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2vw,28px)}
+.mcoin{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,2.1vw,28px);display:flex;align-items:center;gap:clamp(14px,1.8vw,22px)}
+.mcoin .mbig{font-family:var(--font-display);font-weight:600;font-size:clamp(40px,5.4vw,72px);line-height:.85}
+.mcoin.keep{border-color:var(--teal-soft)}.mcoin.keep .mbig{color:var(--teal)}
+.mcoin.lose .mbig{color:var(--accent)}
+.mcoin .ml2{font-size:clamp(12px,1.2vw,15px);color:var(--text);line-height:1.35}.mcoin .ml2 b{color:var(--head)}
+/* slide 12 — pillar svg icons */
+.pillar .pi svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* slide 13 — welcome */
+.welcome{display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(22px,3.6vw,50px);align-items:center}
+.welcome-ill{display:flex;align-items:center;justify-content:center}
+.wsteps{display:flex;flex-direction:column;gap:clamp(8px,1.4vh,14px)}
+.wstep{display:flex;gap:14px;align-items:center}
+.wstep .wn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--font-display);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center}
+.wstep .wt{font-weight:600;font-size:clamp(14px,1.4vw,17px);color:var(--head)}
+.wstep .wd{font-size:clamp(12px,1.18vw,14px);color:var(--muted);line-height:1.35}
+@media(max-width:820px){.welcome{grid-template-columns:1fr}}
+/* slide 13 — fast illustrated flow */
+.fastbadge{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--teal);background:var(--teal-soft);border-radius:999px;padding:7px 15px;margin:0 auto clamp(14px,2.4vh,24px)}
+.fastflow{display:flex;align-items:stretch;justify-content:center;gap:clamp(6px,1vw,14px)}
+.ffstep{flex:1;max-width:236px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,1.9vw,24px) clamp(12px,1.4vw,18px);text-align:center;display:flex;flex-direction:column;align-items:center;gap:9px;box-shadow:0 12px 26px -22px rgba(60,40,20,.5)}
+.ffstep.win{background:var(--accent-soft);border-color:#e9c9b6}
+.ffic{width:clamp(50px,4.8vw,66px);height:clamp(50px,4.8vw,66px);border-radius:50%;background:var(--accent-soft);color:var(--accent-deep);display:flex;align-items:center;justify-content:center}
+.ffstep.win .ffic{background:var(--accent);color:#fff}
+.ffic svg{width:52%;height:52%;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fftime{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-deep);background:#fff;border:1px solid #e9c9b6;border-radius:999px;padding:3px 11px}
+.fftt{font-family:var(--font-display);font-weight:600;font-size:clamp(15px,1.5vw,20px);color:var(--head)}
+.ffd{font-size:clamp(11.5px,1.15vw,14px);color:var(--muted);line-height:1.4}
+.ffarrow{display:flex;align-items:center;color:var(--accent);font-weight:700;font-size:20px;flex:none}
+@media print{@page{size:1280px 720px;margin:0}body{overflow:visible}.nav,.hint,.progress,.notes,.creplay{display:none!important}.deck{position:static}.slide{position:relative;opacity:1!important;visibility:visible!important;transform:none!important;width:1280px;height:720px;page-break-after:always;display:flex}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 TITLE -->
+  <section class="slide active" data-notes="">
+    <span class="hdots bl teal"></span><span class="hdots tr gold" style="opacity:.28"></span>
+    <div class="t-top"><div class="eyebrow">Ely — by LOKAL</div><div class="t-meta"><span>Product overview</span><span>For hotels</span><span>2026</span></div></div>
+    <div class="t-hero">
+      <div>
+        <div class="ely-word">Ely<span class="dot">.</span></div>
+        <div class="t-by">the AI front desk · by LOKAL</div>
+        <div class="t-tag">Be the answer — in every language, on every channel, around the clock.</div>
+        <div class="t-sub">One AI concierge that greets, answers, and books your guests instantly — in their language, wherever they message you, day or night.</div>
+        <a href="https://www.lkl.ai/ely" style="margin-top:22px;display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:clamp(14px,1.4vw,17px);color:var(--accent-deep);background:var(--accent-soft);border:1px solid #e9c9b6;border-radius:11px;padding:10px 18px;text-decoration:none">🔗 www.lkl.ai/ely</a>
+      </div>
+      <div class="hotelwrap"><canvas class="ht" id="htHotel" aria-label="Hotel"></canvas><span class="hotel-cap">your hotel, always answered</span></div>
+    </div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>01 / 13</span></div>
+  </section>
+
+  <!-- 2 OPPORTUNITY -->
+  <section class="slide" data-notes="">
+    <span class="hdots tr"></span>
+    <div class="slide-head"><div class="eyebrow">01 — The opportunity</div><h2>Your guests are messaging. Keeping up is impossible — for people.</h2>
+      <div class="subhead">They arrive at all hours, from everywhere, in their own language. Every slow or missed reply is a booking handed to an OTA.</div></div>
+    <div class="body"><div class="vizrow">
+      <div class="vpanel"><div class="vk">Around the clock</div><div class="vmid"><svg class="statill" viewBox="0 0 88 62" fill="none" stroke="#C25A2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M34 8a19 19 0 1 0 15 30A23 23 0 0 1 34 8z" fill="#F1DCCD"/><circle cx="55" cy="12" r="1.6" fill="#C25A2E" stroke="none"/><circle cx="63" cy="20" r="1.2" fill="#C25A2E" stroke="none"/><circle cx="59" cy="6" r="1.1" fill="#C25A2E" stroke="none"/><path d="M50 36h26a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-9l-6 5v-5a3 3 0 0 1-3-3v-8a3 3 0 0 1 2-3z" fill="#fff"/><path d="M58 43h12M58 47h8" stroke-width="2"/></svg><div class="vn">1 in 3</div><div class="vl">guest messages arrive after-hours, when the front desk is light or closed.</div></div><div class="vs">AgentZap, 2026</div></div>
+      <div class="vpanel"><div class="vk">Guests from everywhere</div><div class="vmid"><svg class="statill" viewBox="0 0 88 62" fill="none" stroke="#C25A2E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="35" cy="33" r="23" fill="#F1DCCD"/><ellipse cx="35" cy="33" rx="9.5" ry="23"/><path d="M12 33h46M16 21h38M16 45h38"/><path d="M70 12a7 7 0 0 0-7 7c0 5 7 12 7 12s7-7 7-12a7 7 0 0 0-7-7z" fill="#fff"/><circle cx="70" cy="19" r="2.6" fill="#C25A2E" stroke="none"/></svg><div class="vn">100+</div><div class="vl">countries your guests come from — each expecting to be understood in their own language.</div></div><div class="vs">Global travel demand</div></div>
+      <div class="vpanel"><div class="vk">Speed wins</div><div class="vmid"><svg class="statill" viewBox="0 0 88 62" fill="none" stroke="#C25A2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M78 12 32 35l14 4 4 13 9-11z" fill="#F1DCCD"/><path d="M46 39 60 24"/><path d="M8 22h17M4 33h15M11 44h13" stroke-width="2.6"/></svg><div class="vn">21×</div><div class="vl">more likely to convert a lead when you reply in five minutes instead of thirty.</div></div><div class="vs">MIT / Harvard Business Review</div></div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>02 / 13</span></div>
+  </section>
+
+  <!-- 3 MEET ELY -->
+  <section class="slide" data-notes="">
+    <span class="hdots tr"></span>
+    <div class="slide-head"><div class="eyebrow">02 — Meet Ely</div><h2>One concierge. Every channel. Every language. Every hour.</h2>
+      <div class="subhead">Ely answers your guests instantly and on-brand — and knows exactly when to bring in your team.</div></div>
+    <div class="body"><div class="cols t6040">
+      <div>
+        <div class="feat" style="gap:clamp(11px,1.7vh,17px)">
+          <div class="fitem"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="ft">Answers instantly, everywhere</div><div class="fd">Website, Facebook, WhatsApp, SMS and more — one concierge across every channel.</div></div></div>
+          <div class="fitem blue"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2M9 16h6M7 12h2m4 0h4"/></svg></div><div><div class="ft">In your guest's language</div><div class="fd">Understands and replies in 50+ languages, automatically.</div></div></div>
+          <div class="fitem gold"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4 3 6.5 7 9 4-2.5 7-5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div><div><div class="ft">From your knowledge, in your voice</div><div class="fd">Speaks only from what you've approved — never made up.</div></div></div>
+          <div class="fitem teal"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M16 4h4v4M20 4 13 11M9 7H5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4"/></svg></div><div><div class="ft">Books guests, hands off when needed</div><div class="fd">Drives direct bookings and routes anything sensitive to your team.</div></div></div>
+        </div>
+      </div>
+      <div style="justify-self:center;width:100%;display:flex;flex-direction:column;align-items:center">
+        <div class="chat" id="chatMeet"><button class="creplay">↻ Replay</button>
+          <div class="chead"><span class="cback">‹</span><div><div class="ct">Azure Bay Resort <span class="od"></span></div><div class="cs">Typically replies in seconds</div></div></div>
+          <div class="cbody"></div><div class="cfoot"><div class="inp">Type your message…</div></div>
+        </div>
+        <div class="shotcap">Ely, answering a guest in real time.</div>
+      </div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>03 / 13</span></div>
+  </section>
+
+  <!-- 4 THE BIG IDEA -->
+  <section class="slide clay" data-notes="">
+    <span class="hdots tr teal"></span>
+    <div class="slide-head"><div class="eyebrow">03 — What makes Ely</div><h2>Three strengths. One hotel concierge.</h2>
+      <div class="subhead">Ely brings together the reach of a modern messaging platform, frontier AI, and deep hotel expertise — as a single product you switch on.</div></div>
+    <div class="body"><div class="combo">
+      <div class="combo-row">
+        <div class="engine a"><div class="ei"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="er">Reach</div><div class="en">Every channel, one inbox</div><div class="ed">Guests reach you on web, Facebook, WhatsApp &amp; SMS — your team sees it all in one place.</div></div>
+        <div class="engine b"><div class="ei"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 1 4 4 3 3 0 0 1 1 5 3 3 0 0 1-3 4h-4a3 3 0 0 1-3-4 3 3 0 0 1 1-5 4 4 0 0 1 4-4z"/></svg></div><div class="er">Intelligence</div><div class="en">Frontier AI, built in</div><div class="ed">Understands, decides, and speaks your guests' language — fast and affordable at any volume.</div></div>
+        <div class="engine c"><div class="ei"><svg class="ico" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg></div><div class="er">Hospitality</div><div class="en">Hotel expertise</div><div class="ed">Your knowledge, your bookings, your growth — hospitality know-how baked into every reply.</div></div>
+      </div>
+      <div class="plus">↓</div>
+      <div class="eq"><div class="em">Ely<span class="dot">.</span></div><div class="et">Every feature of a modern messaging platform, frontier AI, and a hotel growth team — combined into one concierge, ready for your property.</div></div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>04 / 13</span></div>
+  </section>
+
+  <!-- 5 CHANNELS -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">04 — Reach</div><h2>Be where your guests already are.</h2>
+      <div class="subhead">Ely runs on Chatwoot, so it works where your guests already are — <b>live today on website, Facebook, WhatsApp and SMS</b>, with more rolling out.</div></div>
+    <div class="body">
+      <div class="chgrp live">Live today</div>
+      <div class="chips">
+        <div class="chip live"><span class="ci">🌐</span>Website chat</div>
+        <div class="chip live"><span class="ci">💬</span>Facebook Messenger</div>
+        <div class="chip live"><span class="ci">🟢</span>WhatsApp</div>
+        <div class="chip live"><span class="ci">📱</span>SMS</div>
+      </div>
+      <div class="chgrp avail">Coming soon</div>
+      <div class="chips">
+        <div class="chip" style="opacity:.58"><span class="ci">📸</span>Instagram</div>
+        <div class="chip" style="opacity:.58"><span class="ci">✉️</span>Email</div>
+        <div class="chip" style="opacity:.58"><span class="ci">✈️</span>Telegram</div>
+        <div class="chip" style="opacity:.58"><span class="ci">💚</span>LINE</div>
+        <div class="chip" style="opacity:.58"><span class="ci">🎵</span>TikTok</div>
+        <div class="chip" style="opacity:.58"><span class="ci">📞</span>Voice</div>
+      </div>
+      <div class="feat" style="margin-top:clamp(18px,3vh,32px);display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,26px)">
+        <div class="fitem teal"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h18v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l2-3h14l2 3"/></svg></div><div><div class="ft">One inbox for the whole team</div><div class="fd">Every conversation, every channel, in a single shared workspace — nothing falls through the cracks.</div></div></div>
+        <div class="fitem"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 8h6M8 12h8M8 16h5"/></svg></div><div><div class="ft">One knowledge base, every channel</div><div class="fd">Set up your hotel's answers once — Ely uses them everywhere. No per-channel content to maintain.</div></div></div>
+      </div>
+    </div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>05 / 13</span></div>
+  </section>
+
+  <!-- 6 LANGUAGES -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">05 — Languages</div><h2>Speaks your guests' language — 50+ of them.</h2>
+      <div class="subhead">Guests message in their own language. Ely understands and replies in theirs — <b>automatically</b>, with no extra setup.</div></div>
+    <div class="body"><div class="cols t6040">
+      <div>
+        <div class="langgrid">
+          <span class="lchip">English</span><span class="lchip">Español</span><span class="lchip">中文</span><span class="lchip">日本語</span><span class="lchip">Français</span><span class="lchip">Deutsch</span><span class="lchip">العربية</span><span class="lchip">한국어</span><span class="lchip">Português</span><span class="lchip">Italiano</span><span class="lchip">हिन्दी</span><span class="lchip">Bahasa</span><span class="lchip">Tiếng Việt</span><span class="lchip">Русский</span><span class="lchip">ภาษาไทย</span><span class="lchip more">+ 40 more</span>
+        </div>
+        <p class="lead" style="margin-top:22px">Right-to-left scripts like Arabic and Hebrew are fully supported — the whole conversation adapts. Your overseas guests feel at home from the first message.</p>
+      </div>
+      <div style="justify-self:center;width:100%;display:flex;flex-direction:column;align-items:center">
+        <div class="chat" id="chatLang"><button class="creplay">↻ Replay</button>
+          <div class="chead"><span class="cback">‹</span><div><div class="ct">Azure Bay Resort <span class="od"></span></div><div class="cs">Typically replies in seconds</div></div></div>
+          <div class="cbody"></div><div class="cfoot"><div class="inp">메시지를 입력하세요…</div></div>
+        </div>
+        <div class="shotcap">Guest wrote in Korean — Ely answered in Korean.</div>
+      </div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>06 / 13</span></div>
+  </section>
+
+  <!-- 7 VISION -->
+  <section class="slide blue" data-notes="">
+    <span class="hdots tr"></span>
+    <div class="slide-head"><div class="eyebrow">06 — For your team</div><h2>Your guests speak 50 languages. Your team only needs English.</h2>
+      <div class="subhead">When a chat needs a human, your agent gets the whole conversation — <b>summarized in clear English</b>, with everything they need to reply in seconds.</div></div>
+    <div class="body"><div class="cols t6040">
+      <div>
+        <div class="feat" style="gap:clamp(11px,1.7vh,17px)">
+          <div class="fitem"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h4"/></svg></div><div><div class="ft">An English summary of every chat</div><div class="fd">Korean, Arabic, Spanish — however the guest wrote, your agent reads a clear English recap, including what's in any photo they sent.</div></div></div>
+          <div class="fitem blue"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5h7M7.5 4.2c0 4-2.2 7.3-5.5 9M5 9c0 2.2 2.5 4.3 5.5 5"/><path d="M13 20l4-9 4 9M14.6 16.6h4.8"/></svg></div><div><div class="ft">Suggested replies, auto-translated</div><div class="fd">Your agent writes in English; Ely sends it to the guest in their language.</div></div></div>
+          <div class="fitem teal"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h18v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l2-3h14l2 3"/></svg></div><div><div class="ft">One shared inbox — take over anytime</div><div class="fd">Every channel, every chat, your whole team in one place.</div></div></div>
+          <div class="fitem gold"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3z"/><path d="M8 9h8M8 12h5"/></svg></div><div><div class="ft">Notes, assignment &amp; collaboration</div><div class="fd">Flag, assign and discuss internally — guests never see it.</div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div class="agentui">
+          <div class="au-head"><div class="au-h-l"><span class="au-ch">WhatsApp</span> · Guest · <span class="au-flag">한국어</span></div><span class="au-status">● needs reply</span></div>
+          <div class="au-grid">
+            <div class="au-thread">
+              <div class="amsg guest">주말에 바다 전망 객실 있나요?</div>
+              <div class="amsg ely">네! 디럭스 오션뷰 가능합니다 🌊</div>
+              <div class="amsg guest">늦은 체크아웃도 되나요?</div>
+              <div class="au-handoff">↪ handed to you</div>
+            </div>
+            <div class="au-side">
+              <div class="au-card sum"><div class="au-ct">✦ Summary · English</div><p>Guest asked about a <b>sea-view room</b> this weekend (available — Ely shared the booking link). Now asking about <b>late check-out</b> — needs your confirmation.</p></div>
+              <div class="au-card"><div class="au-ct">Suggested reply</div><p>"Late check-out to 2 PM is ₱800 — shall I add it?"</p><div class="au-trans">🌐 will send in Korean</div></div>
+              <div class="au-tags"><span>You</span><span>Open</span><span>VIP guest</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="shotcap" style="margin-top:11px">The agent's view — a Korean chat, summarized in English.</div>
+      </div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>07 / 13</span></div>
+  </section>
+
+  <!-- 8 TRUST -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">07 — Trust</div><h2>Answers from your knowledge — and never guesses.</h2>
+      <div class="subhead">A confidently wrong answer costs you a guest <b>and</b> a review. Ely is built so that never happens in your name.</div></div>
+    <div class="body"><div class="feat" style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,26px)">
+      <div class="fitem gold"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></div><div><div class="ft">Only your approved facts</div><div class="fd">Every answer traces to knowledge you signed off — sourced and dated. Nothing invented.</div></div></div>
+      <div class="fitem"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 5 8 8 8 8s8-3 8-8V6z"/></svg></div><div><div class="ft">Confident, or it defers</div><div class="fd">If it isn't sure, Ely doesn't guess — it hands the guest to a human, gracefully.</div></div></div>
+      <div class="fitem teal"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M16 4h4v4M20 4 13 11M9 7H5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4"/></svg></div><div><div class="ft">Guardrails you control</div><div class="fd">Never quotes live rates it shouldn't, never touches complaints or sensitive topics — those go to your team by rule.</div></div></div>
+      <div class="fitem blue"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="ft">Everything is reviewable</div><div class="fd">Every conversation and answer is logged — full visibility, and you can step in anytime.</div></div></div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>08 / 13</span></div>
+  </section>
+
+  <!-- 9 BOOKINGS -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">08 — Revenue</div><h2>Turns conversations into direct bookings.</h2>
+      <div class="subhead">Ely doesn't just talk — it <b>qualifies, books, and acts</b>, keeping the margin an OTA would take.</div></div>
+    <div class="body">
+      <div class="conv">
+        <div class="cnode"><div class="ci2"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="ct2">Guest asks</div><div class="cd2">Rooms, dates, rates</div></div>
+        <div class="cdash"></div>
+        <div class="cnode"><div class="ci2"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19.5 4.5v3M5 16v2.5"/></svg></div><div class="ct2">Ely qualifies</div><div class="cd2">A short, natural chat</div></div>
+        <div class="cdash"></div>
+        <div class="cnode win"><div class="ci2"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div><div class="ct2">Books direct</div><div class="cd2">Your link, your best rate</div></div>
+      </div>
+      <div class="margin">
+        <div class="mcoin keep"><div class="mbig">~95%</div><div class="ml2"><b>Direct booking</b><br>stays in your pocket — almost all of it.</div></div>
+        <div class="mcoin lose"><div class="mbig">15–25%</div><div class="ml2"><b>Gone to the OTA</b><br>on every booking. Ely keeps guests direct.</div></div>
+      </div>
+      <p class="lead" style="text-align:center;max-width:none;margin-top:clamp(14px,2.2vh,22px)">And even when Ely hands off, it <b style="color:var(--accent)">captures the lead</b> — so no conversation is wasted. <span style="font-size:.8em;color:var(--muted)">— OTA commission 15–25%, Cloudbeds 2026</span></p>
+    </div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>09 / 13</span></div>
+  </section>
+
+  <!-- 10 TEAM + SCALE -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">09 — Operations</div><h2>Works with your team — and scales without the cost.</h2>
+      <div class="subhead">Ely takes the repetitive volume off your staff, and routes the right work to the right place — and the right AI.</div></div>
+    <div class="body"><div class="cols t5050">
+      <div class="feat">
+        <div class="fitem"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20c0-2 1.5-3.5 4-3.5s4 1.5 4 3.5"/></svg></div><div><div class="ft">Built for your team</div><div class="fd">Shared inbox, smart handoff, assignment, private notes, canned replies, business hours, satisfaction surveys and SLAs.</div></div></div>
+        <div class="fitem gold"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></svg></div><div><div class="ft">Automations that save hours</div><div class="fd">Routing rules, follow-ups, and one-click actions handle the busywork so staff focus on guests.</div></div></div>
+      </div>
+      <div class="feat">
+        <div class="fitem teal"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><div><div class="ft">Fast &amp; affordable at scale</div><div class="fd">Routine questions go to a fast, low-cost model; the hard ones to a deeper one. You get great answers without enterprise bills.</div></div></div>
+        <div class="fitem blue"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><div class="ft">24/7, unlimited conversations</div><div class="fd">One concierge handles peak season, midnight, and every channel at once — it never queues and never sleeps.</div></div></div>
+      </div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>10 / 13</span></div>
+  </section>
+
+  <!-- 11 INTELLIGENCE -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">10 — Intelligence</div><h2>Every conversation makes you smarter.</h2>
+      <div class="subhead">Ely turns thousands of guest messages into a clear read on demand, gaps, and revenue.</div></div>
+    <div class="body"><div class="feat" style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,26px)">
+      <div class="fitem"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 14 3-4 4 3 5-7"/></svg></div><div><div class="ft">Know what guests actually want</div><div class="fd">See the most-asked questions, ranked — so you fix the gaps and stock the right offers.</div></div></div>
+      <div class="fitem teal"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 8-8 8 8 0 0 1 8 8M20 12a8 8 0 0 1-8 8 8 8 0 0 1-8-8"/><path d="M17 4v4h-4M7 20v-4h4"/></svg></div><div><div class="ft">Knowledge that grows itself</div><div class="fd">Every question Ely can't answer becomes a one-click item to approve — coverage compounds.</div></div></div>
+      <div class="fitem gold"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 12h6M9 16h6"/></svg></div><div><div class="ft">A monthly scorecard</div><div class="fd">Volume handled, response speed, deflection, and direct bookings Ely influenced — owner-ready.</div></div></div>
+      <div class="fitem blue"><div class="fic"><svg class="ico" viewBox="0 0 24 24"><path d="M12 17.3 6.2 21l1.5-6.6L2.5 10l6.7-.6L12 3l2.8 6.4 6.7.6-5.2 4.4L17.8 21z"/></svg></div><div><div class="ft">Guest happiness, measured</div><div class="fd">Built-in satisfaction surveys show how guests rate every conversation.</div></div></div>
+    </div></div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>11 / 13</span></div>
+  </section>
+
+  <!-- 12 COMPLETE FEATURE SET -->
+  <section class="slide" data-notes="">
+    <div class="slide-head"><div class="eyebrow">11 — Everything Ely does</div><h2>The complete feature set.</h2>
+      <div class="subhead">One product — the capabilities of a modern messaging platform, frontier AI, and a hotel growth team, combined.</div></div>
+    <div class="body" style="justify-content:flex-start">
+      <div class="mega">
+        <div class="pillar"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><h4>Channels &amp; reach</h4></div><ul><li>Website live chat</li><li>WhatsApp · Messenger</li><li>Instagram · TikTok</li><li>Email · SMS</li><li>Telegram · LINE</li><li>One unified inbox</li></ul></div>
+        <div class="pillar b"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span><h4>Languages &amp; understanding</h4></div><ul><li>50+ languages</li><li>Right-to-left scripts</li><li>Reads photos &amp; documents</li><li>Detects intent &amp; sentiment</li><li>Summarises &amp; translates</li><li>Remembers the full thread</li></ul></div>
+        <div class="pillar g"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 5 7 8 7 8s7-3 7-8V6z"/><path d="m9 12 2 2 4-4"/></svg></span><h4>Trust &amp; safety</h4></div><ul><li>Approved knowledge only</li><li>Confidence-gating</li><li>Configurable guardrails</li><li>Seamless human handoff</li><li>Reduced hallucination</li><li>Full conversation log</li></ul></div>
+        <div class="pillar t"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><path d="M20 12V7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span><h4>Conversion</h4></div><ul><li>Direct-booking links</li><li>Lead capture on handoff</li><li>Qualification flows</li><li>Proactive campaigns</li><li>Availability &amp; actions</li><li>OTA-commission savings</li></ul></div>
+        <div class="pillar"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 20c0-2 1.4-3.4 4-3.4s4 1.4 4 3.4"/></svg></span><h4>Team &amp; productivity</h4></div><ul><li>Shared inbox &amp; assignment</li><li>Private notes &amp; collision</li><li>Canned replies &amp; macros</li><li>Labels &amp; automation rules</li><li>Business hours &amp; CSAT</li><li>SLA management</li></ul></div>
+        <div class="pillar b"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/></svg></span><h4>Intelligence &amp; reporting</h4></div><ul><li>Demand &amp; question ranking</li><li>Conversation &amp; agent reports</li><li>CSAT &amp; satisfaction</li><li>Self-growing knowledge</li><li>Monthly scorecard</li><li>Exportable analytics</li></ul></div>
+        <div class="pillar g"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><h4>Scale &amp; economics</h4></div><ul><li>Smart model routing</li><li>Fast + low-cost at volume</li><li>24/7, never queues</li><li>Unlimited conversations</li><li>Million-token memory</li><li>Peak-season ready</li></ul></div>
+        <div class="pillar t"><div class="ph"><span class="pi"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg></span><h4>Platform</h4></div><ul><li>Multi-property management</li><li>Your brand &amp; voice</li><li>Help center / knowledge base</li><li>Mobile apps</li><li>API &amp; integrations</li><li>Your data, your control</li></ul></div>
+      </div>
+      <div class="secband"><span class="si">Enterprise-grade &amp; yours:</span><span>SOC 2 Type II</span><span>·</span><span>GDPR</span><span>·</span><span>AES-256 encryption</span><span>·</span><span>SSO / SAML &amp; 2FA</span><span>·</span><span>audit logs</span><span>·</span><span><b>data residency / self-host</b></span></div>
+    </div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL</span><span>12 / 13</span></div>
+  </section>
+
+  <!-- 13 GET STARTED -->
+  <section class="slide clay" data-notes="">
+    <span class="hdots bl gold"></span><span class="hdots tr"></span>
+    <div class="slide-head"><div class="eyebrow">12 — Get started</div><h2>From hello to live — in five days.</h2>
+      <div class="subhead">A guided, fully-supported rollout. Four simple steps — we do the heavy lifting, you just review and approve.</div></div>
+    <div class="body" style="justify-content:center">
+      <div style="text-align:center"><span class="fastbadge">🚀 Live in 5 days</span></div>
+      <div class="fastflow">
+        <div class="ffstep"><div class="ffic"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></div><div class="fftime">Day 1</div><div class="fftt">Setup call</div><div class="ffd">We map your goals, channels and brand voice.</div></div>
+        <div class="ffarrow">→</div>
+        <div class="ffstep"><div class="ffic"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 12h6M9 16h4"/></svg></div><div class="fftime">Days 2–3</div><div class="fftt">Building your FAQ</div><div class="ffd">We build your knowledge base; you approve every answer.</div></div>
+        <div class="ffarrow">→</div>
+        <div class="ffstep"><div class="ffic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 20c0-2 1.4-3.4 4-3.4s4 1.4 4 3.4"/></svg></div><div class="fftime">Day 4</div><div class="fftt">Team training</div><div class="ffd">A short session so your team can review and step in.</div></div>
+        <div class="ffarrow">→</div>
+        <div class="ffstep win"><div class="ffic"><svg viewBox="0 0 24 24"><path d="M5 15c-1.2 1.2-1.6 5-1.6 5s3.8-.4 5-1.6M14.5 4c3 2.8 4.2 7 3 11l-3.6 3.6L10 14C8.8 10 10 5.8 13 3a2.5 2.5 0 0 1 1.5 1z"/><circle cx="13.5" cy="9" r="1.6"/></svg></div><div class="fftime">Day 5</div><div class="fftt">Launch 🎉</div><div class="ffd">Ely goes live on website, Facebook, WhatsApp &amp; SMS.</div></div>
+      </div>
+      <div style="text-align:center;margin-top:clamp(18px,3vh,30px)">
+        <a href="https://www.lkl.ai/ely" style="display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:clamp(15px,1.5vw,18px);color:#fff;background:var(--accent);border-radius:12px;padding:13px 28px;text-decoration:none;box-shadow:0 12px 26px -12px rgba(194,90,46,.6)">Let's get started → www.lkl.ai/ely</a>
+      </div>
+    </div>
+    <div class="foot"><span class="wm">Ely <b>·</b> by LOKAL · hello@lkl.ai</span><span>13 / 13</span></div>
+  </section>
+
+</div>
+
+<div class="notes" id="notes"><h4>Speaker notes — press N</h4><p id="notesText"></p></div>
+<div class="nav"><button id="prev">‹</button><span class="count" id="count">01 / 13</span><div class="dots" id="dots"></div><button id="next">›</button></div>
+<div class="hint">← → navigate · F fullscreen</div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),n=slides.length,i=0;
+  var progress=document.getElementById('progress'),count=document.getElementById('count'),dotsWrap=document.getElementById('dots');
+  var notes=document.getElementById('notes'),notesText=document.getElementById('notesText'),notesOpen=false;
+  slides.forEach(function(s,idx){var d=document.createElement('i');d.onclick=function(){go(idx)};dotsWrap.appendChild(d)});
+  var dots=[].slice.call(dotsWrap.children);
+  function pad(x){return (x<9?'0':'')+(x+1)}
+  function render(){
+    slides.forEach(function(s,idx){s.classList.toggle('active',idx===i)});
+    dots.forEach(function(d,idx){d.classList.toggle('on',idx===i)});
+    progress.style.width=((i+1)/n*100)+'%';count.textContent=pad(i)+' / '+n;
+    notesText.textContent=slides[i].getAttribute('data-notes')||'';
+    var chat=slides[i].querySelector('.chat');if(chat&&chat.__play)chat.__play();
+    if(i===0&&window.__htRestart)window.__htRestart();
+  }
+  function go(x){i=Math.max(0,Math.min(n-1,x));render()}
+  function next(){go(i+1)}function prev(){go(i-1)}
+  document.getElementById('next').onclick=next;document.getElementById('prev').onclick=prev;
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+    else if(e.key==='Home'){go(0)}else if(e.key==='End'){go(n-1)}
+    else if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(function(){})}else{document.exitFullscreen&&document.exitFullscreen()}}
+    else if(e.key==='n'||e.key==='N'){notesOpen=!notesOpen;notes.classList.toggle('show',notesOpen)}
+  });
+  document.getElementById('deck').addEventListener('click',function(e){if(e.target.closest('a,button,.nav,.dots,.creplay,.chat'))return;var x=e.clientX,w=window.innerWidth;if(x>w*0.66)next();else if(x<w*0.34)prev()});
+  var sx=null;document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50){dx<0?next():prev()}sx=null},{passive:true});
+
+  /* chat player */
+  var REDUCE=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var SCRIPTS={
+    chatMeet:[
+      {who:"guest",html:"Hi! Do you have a pool and free wifi?"},
+      {who:"ely",html:"Hi there! 🌴 Yes — a rooftop pool with skyline views, and free high-speed WiFi throughout.",t:1200},
+      {who:"ely",html:"Planning a stay with us? I can share our best direct rates:",t:1000},
+      {who:"ely",html:'🔗 <span class="lnk">Check availability</span>',t:800}
+    ],
+    chatLang:[
+      {who:"guest",html:"안녕하세요, 이번 주말에 빈 방 있나요?"},
+      {who:"ely",html:"<span class='fl'>Ely · replying in Korean</span>안녕하세요! 🌴 네, 기꺼이 도와드릴게요.",t:1100},
+      {who:"ely",html:"이번 주말 객실과 <b>최저가 직접 예약</b>은 아래 링크에서 확인하실 수 있어요:",t:1400},
+      {who:"ely",html:'🔗 <span class="lnk">바로 예약하기</span>',t:800}
+    ]
+  };
+  function makeChat(el){
+    var script=SCRIPTS[el.id]||[],body=el.querySelector('.cbody'),timers=[];
+    function clear(){timers.forEach(clearTimeout);timers=[];body.innerHTML=''}
+    function row(m){var r=document.createElement('div');if(m.who==='ely')r.className='crow ely',r.innerHTML='<div class="cav">E</div><div class="bub ely">'+m.html+'</div>';else r.className='crow guest',r.innerHTML='<div class="bub guest">'+m.html+'</div>';body.appendChild(r);requestAnimationFrame(function(){r.classList.add('show')});body.scrollTop=body.scrollHeight}
+    function typing(cb,dur){var t=document.createElement('div');t.className='crow ely';t.innerHTML='<div class="cav">E</div><div class="typing"><i></i><i></i><i></i></div>';body.appendChild(t);requestAnimationFrame(function(){t.classList.add('show')});body.scrollTop=body.scrollHeight;timers.push(setTimeout(function(){t.remove();cb()},dur))}
+    function play(){if(REDUCE){complete();return}clear();var d=350;script.forEach(function(m){if(m.who==='ely'){var db=d;timers.push(setTimeout(function(){typing(function(){row(m)},m.t||900)},db));d+=(m.t||900)+(m.html.length>70?1500:1050)}else{timers.push(setTimeout(function(){row(m)},d));d+=1000}})}
+    function complete(){clear();script.forEach(row)}
+    el.__play=play;el.__complete=complete;var rb=el.querySelector('.creplay');if(rb)rb.onclick=play;
+  }
+  [].slice.call(document.querySelectorAll('.chat')).forEach(makeChat);
+  window.__completeAll=function(){[].slice.call(document.querySelectorAll('.chat')).forEach(function(c){c.__complete&&c.__complete()})};
+
+  /* halftone hotel (blue) */
+  function hx(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+  function mix(a,b,t){return'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')'}
+  var C1=hx('#1E4A66'),C2=hx('#79B0CE');
+  function rr(o,x,y,w,h,r){o.beginPath();o.moveTo(x+r,y);o.arcTo(x+w,y,x+w,y+h,r);o.arcTo(x+w,y+h,x,y+h,r);o.arcTo(x,y+h,x,y,r);o.arcTo(x,y,x+w,y,r);o.closePath();o.fill()}
+  function windows(o,x,y,w,h,cols,rows){o.save();o.fillStyle='#fff';var gx=w/cols,gy=h/rows,pad=Math.min(gx,gy)*0.28;for(var c=0;c<cols;c++)for(var rI=0;rI<rows;rI++)o.fillRect(x+c*gx+pad,y+rI*gy+pad,gx-pad*2,gy-pad*2);o.restore()}
+  function palm(o,x,base,ht){o.save();o.strokeStyle='#000';o.lineWidth=Math.max(2,ht*0.03);o.lineCap='round';o.beginPath();o.moveTo(x,base);o.quadraticCurveTo(x-ht*0.12,base-ht*0.5,x-ht*0.05,base-ht);o.stroke();var tx=x-ht*0.05,ty=base-ht;for(var a=0;a<6;a++){var ang=Math.PI+(a/5)*Math.PI;o.beginPath();o.moveTo(tx,ty);o.quadraticCurveTo(tx+Math.cos(ang)*ht*0.28,ty+Math.sin(ang)*ht*0.22-ht*0.06,tx+Math.cos(ang)*ht*0.5,ty+Math.sin(ang)*ht*0.34);o.lineWidth=Math.max(1.4,ht*0.02);o.stroke()}o.restore()}
+  function paintHotel(o,W,H){o.fillStyle='#000';o.fillRect(0,H*0.9,W,H*0.1);rr(o,W*0.08,H*0.52,W*0.26,H*0.38,8);rr(o,W*0.40,H*0.18,W*0.30,H*0.72,10);o.fillRect(W*0.46,H*0.12,W*0.18,H*0.07);windows(o,W*0.43,H*0.24,W*0.24,H*0.62,4,8);windows(o,W*0.11,H*0.57,W*0.20,H*0.30,3,4);o.fillStyle='#000';o.fillRect(W*0.49,H*0.05,W*0.006,H*0.07);o.beginPath();o.ellipse(W*0.492,H*0.05,W*0.035,H*0.018,0,0,6.2832);o.fill();o.fillRect(W*0.55,H*0.155,W*0.05,H*0.012);o.fillRect(W*0.61,H*0.155,W*0.05,H*0.012);o.beginPath();o.arc(W*0.20,H*0.18,H*0.06,0,6.2832);o.fill();palm(o,W*0.80,H*0.9,H*0.4);palm(o,W*0.90,H*0.9,H*0.3)}
+  function halftone(canvas,paint){
+    var ctx=canvas.getContext('2d'),W=0,H=0,cells=[],gap=8,raf,t=0,mx=-999,my=-999;
+    function build(){var dpr=Math.min(window.devicePixelRatio||1,2);W=canvas.clientWidth;H=canvas.clientHeight;if(!W||!H)return;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);var oc=document.createElement('canvas');oc.width=W;oc.height=H;var o=oc.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,W,H);paint(o,W,H);var d=o.getImageData(0,0,W,H).data;cells=[];for(var y=gap/2;y<H;y+=gap)for(var x=gap/2;x<W;x+=gap){var dark=0,tot=0;for(var sy=-2;sy<=2;sy+=2)for(var sx=-2;sx<=2;sx+=2){var px=(x+sx)|0,py=(y+sy)|0;if(px<0||py<0||px>=W||py>=H)continue;var ix=(py*W+px)*4,lum=(d[ix]+d[ix+1]+d[ix+2])/3;if(lum<128)dark++;tot++}var cov=tot?dark/tot:0;if(cov>0.06)cells.push({x:x,y:y,c:cov,g:y/H})}}
+    canvas.addEventListener('pointermove',function(e){var r=canvas.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
+    canvas.addEventListener('pointerleave',function(){mx=-999;my=-999});
+    function frame(){ctx.clearRect(0,0,W,H);t+=0.016;for(var k=0;k<cells.length;k++){var c=cells[k];var r=c.c*gap*0.6;r*=0.84+0.16*Math.sin(t+c.x*0.04+c.y*0.05);var dx=c.x-mx,dy=c.y-my,dd=Math.sqrt(dx*dx+dy*dy);if(dd<82)r*=1+(82-dd)/82*0.85;ctx.beginPath();ctx.fillStyle=mix(C1,C2,c.g);ctx.globalAlpha=.95;ctx.arc(c.x,c.y,Math.max(.4,r),0,6.2832);ctx.fill()}if(!REDUCE&&i===0)raf=requestAnimationFrame(frame)}
+    function stat(){ctx.clearRect(0,0,W,H);for(var k=0;k<cells.length;k++){var c=cells[k];var r=c.c*gap*0.58;ctx.beginPath();ctx.fillStyle=mix(C1,C2,c.g);ctx.globalAlpha=.95;ctx.arc(c.x,c.y,Math.max(.4,r),0,6.2832);ctx.fill()}}
+    function init(){build();if(REDUCE)stat();else frame()}
+    if(document.fonts&&document.fonts.ready){document.fonts.ready.then(init)}init();setTimeout(init,500);
+    window.addEventListener('resize',function(){build();if(REDUCE)stat()});
+    window.__htRestart=function(){cancelAnimationFrame(raf);if(!REDUCE&&i===0){build();frame()}else stat()};
+  }
+  var hc=document.getElementById('htHotel');if(hc)halftone(hc,paintHotel);
+  render();
+})();
+</script>
+</body>
+</html>
