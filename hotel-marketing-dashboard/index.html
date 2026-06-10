@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Hotel Marketing Dashboard — LOKAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* LOKAL palette — swap --accent for the exact brand hex when confirmed */
+    --ink:#14110C; --ink-2:#1e1a13; --ink-line:#332d22;
+    --bone:#F2EBDC; --bone-2:#E9E0CC; --paper:#FBF6EC;
+    --accent:#C4933F; --accent-2:#D9B567; --accent-deep:#9c7430;
+    --win:#5b7f55; --watch:#c4933f; --risk:#b35a36;
+    --muted:#8c8472; --muted-d:#a99e86; --line:#ddd3bd;
+    --serif:'Fraunces',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --ease:cubic-bezier(.16,1,.3,1);
+    --shadow:0 40px 90px -40px rgba(20,17,12,.6);
+    --shadow-sm:0 18px 40px -24px rgba(20,17,12,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);color:var(--ink);background:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+  .deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:7vh 7vw;opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s;pointer-events:none;
+    background:var(--bone);color:var(--ink)}
+  .slide.active{opacity:1;visibility:visible;pointer-events:auto}
+  .slide.dark{background:var(--ink);color:var(--bone)}
+  .slide.dark::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+     radial-gradient(120% 80% at 80% -10%, rgba(196,147,63,.16), transparent 60%),
+     radial-gradient(90% 60% at -10% 110%, rgba(196,147,63,.08), transparent 55%);
+     animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,-1.5%,0) scale(1.05)}}
+  .wrap{width:100%;max-width:1180px;margin:0 auto;position:relative;z-index:2}
+
+  /* TYPE */
+  .eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-deep);display:inline-flex;align-items:center;gap:11px}
+  .slide.dark .eyebrow{color:var(--accent-2)}
+  .eyebrow .dotmk{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(196,147,63,.5);animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(196,147,63,.5)}70%{box-shadow:0 0 0 9px rgba(196,147,63,0)}100%{box-shadow:0 0 0 0 rgba(196,147,63,0)}}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.015em;line-height:1.0}
+  .display{font-size:clamp(2.7rem,6.6vw,6rem);font-weight:480}
+  .title{font-size:clamp(2.1rem,5vw,4.1rem);font-weight:480}
+  .pd{color:var(--accent)}
+  em.it{font-style:italic;color:var(--accent-deep)} .slide.dark em.it{color:var(--accent-2)}
+  .lead{font-family:var(--sans);font-size:clamp(1.02rem,1.55vw,1.32rem);line-height:1.55;color:#4a4334;max-width:44ch;font-weight:400}
+  .slide.dark .lead{color:#cdc4b0}
+  .lead.wide{max-width:58ch}
+  .kicker{font-family:var(--sans);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .quote{font-family:var(--serif);font-style:italic;color:var(--accent-2)}
+
+  /* MASKED LINE REVEAL */
+  .mask{display:block;overflow:hidden;padding-bottom:.08em}
+  .mask > i{display:block;font-style:inherit;transform:translateY(116%)}
+  .slide.active .mask > i{transform:none;transition:transform 1s var(--ease) var(--d,0s)}
+  .mask.it > i{font-style:italic}
+
+  /* REVEAL (fades / parallax) */
+  .reveal{opacity:0;transform:translateY(22px)}
+  .reveal.fromR{transform:translateX(46px)}
+  .reveal.fromL{transform:translateX(-46px)}
+  .reveal.fade{transform:none}
+  .slide.active .reveal{opacity:1;transform:none;transition:opacity .85s var(--ease) var(--d,0s),transform .9s var(--ease) var(--d,0s)}
+
+  .stack>*+*{margin-top:20px}
+  .split{display:grid;grid-template-columns:1.02fr .98fr;gap:5vw;align-items:center}
+  .split.rev{grid-template-columns:.98fr 1.02fr}
+  .center{text-align:center;display:flex;flex-direction:column;align-items:center}
+  .center .lead{margin-inline:auto}
+  .rule{height:1px;background:var(--line);width:100%;transform:scaleX(0);transform-origin:left}
+  .slide.dark .rule{background:var(--ink-line)}
+  .slide.active .rule{transform:scaleX(1);transition:transform 1s var(--ease) var(--d,.3s)}
+
+  .stat{font-family:var(--serif);font-weight:480;color:var(--ink);line-height:.9;letter-spacing:-.02em}
+  .slide.dark .stat{color:var(--bone)}
+  .stat .u{color:var(--accent)}
+  .statbig{font-size:clamp(3rem,7vw,5.6rem)} .statmed{font-size:clamp(2.2rem,4vw,3.2rem)}
+  .stlabel{font-family:var(--sans);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:10px}
+  .slide.dark .stlabel{color:var(--muted-d)}
+  .statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+  .statrow .col{border-top:1px solid var(--line);padding-top:16px} .slide.dark .statrow .col{border-top-color:var(--ink-line)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid var(--line);border-radius:40px;font-size:.86rem;font-weight:500;color:#4a4334}
+  .slide.dark .chip{border-color:var(--ink-line);color:#d8cfba}
+  .chip .ck{color:var(--accent)}
+
+  .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .colitem{border-top:2px solid var(--accent);padding-top:18px}
+  .colitem .n{font-family:var(--sans);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px} .slide.dark .colitem .n{color:var(--muted-d)}
+  .colitem h3{font-size:1.7rem;margin-bottom:8px}
+  .colitem p{font-family:var(--sans);font-size:.95rem;line-height:1.5;color:#4a4334} .slide.dark .colitem p{color:#cdc4b0}
+
+  .swr{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .swr .it{border-left:3px solid var(--line);padding:4px 0 4px 18px}
+  .swr .it.win{border-left-color:var(--win)} .swr .it.watch{border-left-color:var(--watch)} .swr .it.risk{border-left-color:var(--risk)}
+  .swr .fl{font-family:var(--sans);font-size:.66rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:9px}
+  .swr .win .fl{color:var(--win)} .swr .watch .fl{color:var(--watch)} .swr .risk .fl{color:var(--risk)}
+  .swr h3{font-size:1.3rem;line-height:1.12;margin-bottom:6px}
+  .swr p{font-family:var(--sans);font-size:.88rem;color:#5b5340;line-height:1.45} .slide.dark .swr p{color:#c9c0ab}
+
+  .bar{height:10px;border-radius:6px;background:rgba(20,17,12,.1);overflow:hidden;display:flex} .slide.dark .bar{background:rgba(242,235,220,.12)}
+  .bar > i{display:block;height:100%;width:0;transition:width 1.4s var(--ease) .25s}
+  .slide.active .bar > i{width:var(--w,60%)}
+  .bar .you{background:linear-gradient(90deg,var(--accent),var(--accent-2))} .bar .ota{background:rgba(20,17,12,.18)} .slide.dark .bar .ota{background:rgba(242,235,220,.2)}
+  .barkey{display:flex;justify-content:space-between;font-family:var(--sans);font-size:.78rem;color:var(--muted);margin-top:10px}
+  .barkey b{color:var(--accent-deep)} .slide.dark .barkey b{color:var(--accent-2)}
+
+  .spark path.l{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+  .slide.active .spark path.l{transition:stroke-dashoffset 1.7s ease .35s;stroke-dashoffset:0}
+  .spark path.f{fill:var(--accent);opacity:.1}
+
+  /* DEVICE FRAMES + cinematic cover tilt */
+  .tilt{transform:perspective(1300px) rotateY(-13deg) rotateX(5deg) translateY(14px);opacity:0;transform-style:preserve-3d}
+  .slide.active .tilt{transform:perspective(1300px) rotateY(0) rotateX(0) translateY(0);opacity:1;transition:transform 1.2s var(--ease) .3s,opacity 1s ease .3s}
+  .browser{width:100%;max-width:600px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.06);position:relative}
+  .bchrome{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#ece6d9;border-bottom:1px solid #ddd3bd}
+  .bchrome .d{width:11px;height:11px;border-radius:50%}
+  .bchrome .url{margin-left:10px;flex:1;background:#fbf7ee;border:1px solid #ddd3bd;border-radius:7px;padding:5px 12px;font-family:var(--sans);font-size:.72rem;color:#8c8472;display:flex;align-items:center;gap:7px}
+  .bchrome .url svg{width:11px;height:11px;color:var(--win)}
+  .phone{width:230px;border-radius:34px;background:#14110c;padding:9px;box-shadow:var(--shadow);position:relative}
+  .phone .pscreen{border-radius:26px;overflow:hidden;background:#fff;position:relative}
+  .phone .pill{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:56px;height:7px;border-radius:5px;background:#14110c;z-index:6}
+  .screenwrap{position:relative}
+  .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:5;background:#fff}
+
+  /* PORTAL recreation */
+  .pv{background:var(--paper);font-family:var(--sans);color:var(--ink);position:relative;z-index:2}
+  .pv .ph{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .pv .mono{width:30px;height:30px;border-radius:7px;background:var(--ink);color:var(--bone);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:14px}
+  .pv .pn{font-family:var(--serif);font-weight:600;font-size:15px;line-height:1}
+  .pv .ps{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+  .pv .ptabs{margin-left:auto;display:flex;gap:7px;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .pv .ptabs b{color:var(--accent-deep)}
+  .pv .live{display:inline-flex;align-items:center;gap:4px;color:var(--win);font-size:8px;font-weight:700;letter-spacing:.1em}
+  .pv .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--win);animation:pulse 2s infinite}
+  .pv .pb{padding:16px}
+  .pv .ph1{font-family:var(--serif);font-weight:500;font-size:19px;line-height:1.12;letter-spacing:-.01em;margin-bottom:14px}
+  .pv .ph1 em{font-style:italic;color:var(--accent-deep)}
+  .pv .pswr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+  .pv .pc{padding:8px 9px;border-left:2px solid var(--line)}
+  .pv .pc.w{border-left-color:var(--win)} .pv .pc.t{border-left-color:var(--watch)} .pv .pc.r{border-left-color:var(--risk)}
+  .pv .pc span{font-size:6.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+  .pv .pc.w span{color:var(--win)} .pv .pc.t span{color:var(--watch)} .pv .pc.r span{color:var(--risk)}
+  .pv .pc p{font-size:8px;margin-top:4px;line-height:1.25;color:#5b5340}
+  .pv .pmetric{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:13px}
+  .pv .pmetric .big{font-family:var(--serif);font-weight:560;font-size:30px;line-height:.85;letter-spacing:-.02em}
+  .pv .pmetric .lab{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .pv .pmetric svg{width:120px;height:38px}
+  .pv .pmetric polyline{stroke-dasharray:1;stroke-dashoffset:1}
+  .slide.active .pv .pmetric polyline{transition:stroke-dashoffset 1.6s ease .5s;stroke-dashoffset:0}
+  .pv .psplit{margin-top:13px}
+  .pv .psplit .lab{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:5px}
+  .pv .psplit .track{height:8px;border-radius:5px;overflow:hidden;display:flex;background:#e7ddc8}
+  .pv .psplit .track b{display:block;height:100%;width:0}
+  .slide.active .pv .psplit .track b{transition:width 1.3s var(--ease) .6s}
+  .pv .psplit .track .a{background:var(--accent)} .pv .psplit .track .o{background:#cdbf9f}
+
+  /* logos */
+  .logorow{display:flex;flex-wrap:wrap;gap:14px}
+  .lchip{display:inline-flex;align-items:center;gap:10px;padding:11px 16px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm)}
+  .slide.dark .lchip{border-color:transparent}
+  .lchip svg,.lchip .tile{width:24px;height:24px;flex:0 0 auto}
+  .lchip span{font-family:var(--sans);font-weight:600;font-size:.86rem;color:#2c2820}
+  .tile{border-radius:6px;display:grid;place-items:center;color:#fff;font-family:var(--sans);font-weight:800;font-size:.7rem}
+  .pop{opacity:0;transform:scale(.8) translateY(8px)}
+  .slide.active .pop{opacity:1;transform:none;transition:.6s var(--ease) var(--d,0s)}
+
+  .stage{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .stagecol{border-top:1px solid var(--line);padding-top:14px} .slide.dark .stagecol{border-top-color:var(--ink-line)}
+  .stagecol .sn{font-family:var(--sans);font-size:.64rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:10px} .slide.dark .stagecol .sn{color:var(--accent-2)}
+  .stagecol h4{font-family:var(--serif);font-size:1.18rem;font-weight:500;margin-bottom:4px}
+  .stagecol .verb{font-family:var(--sans);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .stagelogos{display:flex;gap:8px;flex-wrap:wrap}
+  .stagelogos svg,.stagelogos .tile{width:21px;height:21px}
+
+  .chatbox{width:100%;max-width:430px;background:#fff;border-radius:18px;padding:20px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05)}
+  .bub{padding:12px 15px;border-radius:14px;font-family:var(--sans);font-size:.92rem;line-height:1.4;margin-bottom:11px;max-width:90%;color:#2c2820;opacity:0;transform:translateY(10px)}
+  .slide.active .bub{opacity:1;transform:none;transition:.6s var(--ease) var(--d,0s)}
+  .bub.you{background:#f0e9d8;border-bottom-left-radius:4px}
+  .bub.ai{background:#fff;border:1px solid var(--line);margin-left:auto;border-bottom-right-radius:4px}
+  .bub.ai b{color:var(--accent-deep);background:rgba(196,147,63,.14);padding:1px 5px;border-radius:5px}
+  .chatft{display:flex;align-items:center;gap:9px;margin-top:4px;font-family:var(--sans);font-size:.8rem;color:var(--muted)}
+
+  .dial{position:relative;width:210px;height:210px}
+  .dial svg{transform:rotate(-90deg)}
+  .dial .tk{fill:none;stroke:rgba(20,17,12,.1);stroke-width:13} .slide.dark .dial .tk{stroke:rgba(242,235,220,.14)}
+  .dial .arc{fill:none;stroke:var(--accent);stroke-width:13;stroke-linecap:round;stroke-dasharray:534;stroke-dashoffset:534;transition:stroke-dashoffset 1.6s var(--ease) .4s}
+  .slide.active .dial .arc{stroke-dashoffset:50}
+  .dial .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .dial .ctr .n{font-family:var(--serif);font-weight:560;font-size:3.1rem;line-height:1}
+  .dial .ctr .s{font-family:var(--sans);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  .emailmock{width:100%;max-width:355px;background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid rgba(0,0,0,.05);text-align:left}
+  .emailmock .eh{padding:13px 16px;border-bottom:1px solid var(--line)}
+  .emailmock .efrom{font-size:.8rem;color:#2c2820;font-weight:600;display:flex;align-items:center;gap:8px}
+  .emailmock .efrom .av{width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--bone);display:grid;place-items:center;font-family:var(--serif);font-size:11px;font-weight:600}
+  .emailmock .esub{font-size:.78rem;color:var(--muted);margin-top:6px}
+  .emailmock .ebody{padding:14px 16px}
+  .emailmock .ebody .l{font-family:var(--serif);font-size:1.05rem;margin-bottom:10px}
+  .emailmock .erow{display:flex;gap:8px;font-size:.74rem;color:#5b5340;margin-bottom:7px}
+  .emailmock .erow b{font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.62rem;padding-top:2px}
+  .emailmock .erow .w{color:var(--win)} .emailmock .erow .t{color:var(--watch)} .emailmock .erow .r{color:var(--risk)}
+  .emailmock .ebtn{margin-top:12px;display:inline-block;background:var(--ink);color:var(--bone);font-size:.74rem;font-weight:600;padding:9px 15px;border-radius:8px}
+  .deckmock{position:relative;width:230px;height:150px;flex:0 0 auto}
+  .deckmock .sl{position:absolute;width:200px;height:125px;border-radius:10px;background:#fff;box-shadow:var(--shadow-sm);border:1px solid var(--line);padding:14px}
+  .deckmock .sl1{top:24px;left:24px;transform:rotate(-6deg)} .deckmock .sl2{top:14px;left:14px;transform:rotate(-2deg);opacity:.92} .deckmock .sl3{top:4px;left:2px}
+  .deckmock .sl .e{font-size:6px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-deep);font-weight:700}
+  .deckmock .sl .t{font-family:var(--serif);font-size:14px;margin-top:7px;line-height:1.05}
+  .deckmock .sl .b{height:5px;width:70%;background:#eadfca;border-radius:3px;margin-top:7px} .deckmock .sl .b2{width:50%}
+
+  .road{margin-top:30px;position:relative}
+  .roadline{position:absolute;top:29px;left:5%;right:5%;height:1.5px;background:var(--line)}
+  .roadline::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transform:scaleX(0);transform-origin:left;transition:transform 1.7s cubic-bezier(.4,0,.2,1) .2s}
+  .slide.active .roadline::after{transform:scaleX(1)}
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;position:relative}
+  .step{opacity:0;transform:translateY(16px)}
+  .slide.active .step{opacity:1;transform:none;transition:opacity .6s ease,transform .6s var(--ease);transition-delay:calc(var(--i)*.16s + .3s)}
+  .step .node{width:58px;height:58px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:var(--bone);border:1.5px solid var(--accent);color:var(--accent-deep);position:relative;z-index:2}
+  .step.later .node{border-style:dashed;border-color:var(--muted);color:var(--muted)}
+  .step .node svg{width:24px;height:24px}
+  .step .when{font-family:var(--sans);font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-deep);text-align:center;margin-bottom:7px}
+  .step.now .when{color:var(--win)}
+  .step h4{font-family:var(--serif);font-size:1.05rem;font-weight:500;text-align:center;line-height:1.1;margin-bottom:6px}
+  .step p{font-family:var(--sans);font-size:.78rem;color:#5b5340;line-height:1.4;text-align:center;max-width:22ch;margin:0 auto}
+  .badge{display:block;text-align:center;margin-top:8px}
+  .badge span{font-family:var(--sans);font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--win);border:1px solid rgba(91,127,85,.4);padding:3px 9px;border-radius:20px}
+
+  .cta{display:inline-flex;align-items:center;gap:11px;margin-top:8px;background:var(--accent);color:#1a140a;padding:15px 28px;border-radius:40px;font-family:var(--sans);font-weight:600;font-size:1rem;box-shadow:0 20px 50px -20px rgba(196,147,63,.6);transition:transform .2s}
+  .cta:hover{transform:translateY(-2px)}
+  .contacts{font-family:var(--sans);font-size:.84rem;color:var(--muted-d);margin-top:22px;letter-spacing:.02em}
+
+  /* chrome */
+  .progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;z-index:60;transition:width .5s ease}
+  .topbar{position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:40;pointer-events:none;mix-blend-mode:difference}
+  .wordmark{font-family:var(--serif);font-weight:600;font-size:1.15rem;letter-spacing:.02em;color:#fff}
+  .counter{font-family:var(--sans);font-variant-numeric:tabular-nums;color:#fff;font-size:.74rem;letter-spacing:.12em;opacity:.85}
+  .scene{position:fixed;bottom:26px;left:28px;z-index:40;font-family:var(--sans);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+  .slide.dark ~ .scene{color:var(--muted-d)}
+  .arrows{position:fixed;bottom:22px;right:24px;display:flex;gap:10px;z-index:45}
+  .arrow{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center;cursor:pointer;color:var(--ink);transition:.2s;box-shadow:var(--shadow-sm)}
+  .arrow:hover{background:var(--ink);color:var(--bone);border-color:var(--ink);transform:translateY(-2px)}
+  .arrow svg{width:17px;height:17px}
+  .dots{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:45}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(140,132,114,.5);cursor:pointer;transition:.3s}
+  .dot.on{background:var(--accent);width:22px;border-radius:5px}
+  .hintfade{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);font-family:var(--sans);font-size:.76rem;color:var(--muted-d);z-index:30;display:flex;gap:8px;align-items:center}
+  .kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:2px 7px;font-size:.72rem;color:var(--bone)}
+
+  @media (max-width:880px){
+    .split,.split.rev{grid-template-columns:1fr;gap:30px}
+    .cols3,.statrow,.swr{grid-template-columns:1fr;gap:18px}
+    .stage{grid-template-columns:1fr 1fr;gap:20px}
+    .steps{grid-template-columns:1fr 1fr;gap:24px 12px}
+    .roadline{display:none} .phone,.deckmock{display:none} .tilt{transform:none}
+  }
+  @media (max-width:560px){ .steps,.stage{grid-template-columns:1fr} .hintfade,.counter,.scene{display:none} }
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} .reveal,.step,.bub,.pop{opacity:1;transform:none} .mask>i{transform:none} .spark path.l,.pv polyline{stroke-dashoffset:0} .rule{transform:none} .tilt{transform:none;opacity:1} }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="lg-google" viewBox="0 0 48 48">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+  </symbol>
+  <symbol id="lg-maps" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.7" fill="#fff"/></symbol>
+  <symbol id="lg-openai" viewBox="0 0 24 24"><path fill="#0f0f0e" d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .75 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zm-9.02 12.61a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.79.79 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zM3.6 18.3a4.47 4.47 0 0 1-.53-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06L9.74 19.95A4.5 4.5 0 0 1 3.6 18.3zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.98v5.69a.77.77 0 0 0 .39.68l5.81 3.35-2.02 1.17a.08.08 0 0 1-.07 0l-4.83-2.79A4.5 4.5 0 0 1 2.34 7.9zm16.6 3.86L13.1 8.36l2.02-1.16a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.68a.79.79 0 0 0-.4-.66zm2.01-3.02l-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zM8.31 12.86l-2.02-1.16a.08.08 0 0 1-.04-.06V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.78 2.76a.79.79 0 0 0-.39.68zm1.1-2.37l2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5z"/></symbol>
+  <symbol id="lg-perplexity" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#20808D"/><path d="M12 5v14M12 8.5 6.5 5v6.5L12 8.5l5.5 3V5L12 8.5zM6.5 13v5L12 14.5 17.5 18v-5" fill="none" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+  <symbol id="lg-ta" viewBox="0 0 88 48"><circle cx="26" cy="24" r="20" fill="#34E0A1"/><circle cx="62" cy="24" r="20" fill="#34E0A1"/><circle cx="26" cy="24" r="9.5" fill="#0a2540"/><circle cx="62" cy="24" r="9.5" fill="#0a2540"/><circle cx="26" cy="24" r="3.6" fill="#fff"/><circle cx="62" cy="24" r="3.6" fill="#fff"/><path d="M40 33l4 6 4-6z" fill="#0a2540"/></symbol>
+  <symbol id="lg-tiktok" viewBox="0 0 24 24"><path d="M16.6 5.8a4.8 4.8 0 0 1-1-.1v3.2a7.9 7.9 0 0 1-4.6-1.5v6.8a5.6 5.6 0 1 1-5.6-5.6c.2 0 .4 0 .6.05v3.3a2.4 2.4 0 1 0 1.7 2.3V2h3.3a4.8 4.8 0 0 0 4.5 4.3z" fill="#010101"/></symbol>
+  <symbol id="lg-ig" viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FEDA75"/><stop offset=".4" stop-color="#FA7E1E"/><stop offset=".7" stop-color="#D62976"/><stop offset="1" stop-color="#962FBF"/></linearGradient></defs><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="url(#ig)"/><rect x="6" y="6" width="12" height="12" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="3" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="16.4" cy="7.6" r="1.1" fill="#fff"/></symbol>
+  <symbol id="lg-youtube" viewBox="0 0 24 24"><rect x="1" y="5" width="22" height="14" rx="4" fill="#FF0000"/><path d="M10 8.5v7l6-3.5z" fill="#fff"/></symbol>
+</svg>
+
+<div class="progress" id="progress"></div>
+<div class="topbar"><div class="wordmark">LOKAL</div><div class="counter"><span id="cur">01</span> / <span id="tot">15</span></div></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1 COVER -->
+  <section class="slide dark" data-name="Cover">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow reveal" style="--d:.05s"><span class="dotmk"></span> Manila — Sydney · est 2017</span>
+        <h1 class="display"><span class="mask"><i style="--d:.15s">Your Hotel</i></span><span class="mask"><i style="--d:.27s">Marketing</i></span><span class="mask"><i style="--d:.39s">Dashboard<b class="pd">.</b></i></span></h1>
+        <p class="lead reveal" style="--d:.6s">Every surface a traveler checks before they book — in one link.</p>
+        <div class="reveal quote" style="--d:.74s;font-size:1.25rem">"Be the answer, not a result."</div>
+        <div class="hintfade reveal" style="--d:.9s;position:static;transform:none;margin-top:4px">Press <span class="kbd">→</span> to begin</div>
+      </div>
+      <div class="tilt">
+        <div class="browser">
+          <div class="bchrome"><span class="d" style="background:#ec6a5e"></span><span class="d" style="background:#f4bf4f"></span><span class="d" style="background:#61c554"></span>
+            <span class="url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> yourhotel.lokal.report</span></div>
+          <div class="screenwrap"><div class="pv" data-portal></div><img class="shot" src="hero-desktop.png" alt="" onerror="this.remove()"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 THE SHIFT -->
+  <section class="slide" data-name="The shift">
+    <div class="wrap">
+      <div class="stack" style="margin-bottom:30px;max-width:60ch">
+        <span class="eyebrow reveal"><span class="dotmk"></span> The shift</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">Travelers don't search</i></span><span class="mask"><i style="--d:.22s">in one place anymore.</i></span></h1>
+        <p class="lead wide reveal" style="--d:.36s">They scroll, compare, ask AI, then Google your name. Miss one step and the booking — and the margin — leaks to someone who didn't.</p>
+      </div>
+      <div class="stage">
+        <div class="stagecol reveal" style="--d:.46s"><div class="sn">01 — Discover</div><h4>They get the itch</h4><div class="verb">create demand</div><div class="stagelogos"><svg><use href="#lg-tiktok"/></svg><svg><use href="#lg-ig"/></svg><svg><use href="#lg-youtube"/></svg></div></div>
+        <div class="stagecol reveal" style="--d:.56s"><div class="sn">02 — Compare</div><h4>They shop around</h4><div class="verb">capture demand</div><div class="stagelogos"><span class="tile" style="background:#003580;font-size:.5rem">B.</span><span class="tile" style="background:#1d1d4e;font-size:.5rem">ag</span><svg><use href="#lg-maps"/></svg></div></div>
+        <div class="stagecol reveal" style="--d:.66s"><div class="sn">03 — Validate</div><h4>They ask AI</h4><div class="verb">earn the citation</div><div class="stagelogos"><svg><use href="#lg-openai"/></svg><svg><use href="#lg-perplexity"/></svg><svg><use href="#lg-google"/></svg></div></div>
+        <div class="stagecol reveal" style="--d:.76s"><div class="sn">04 — Return</div><h4>They search your name</h4><div class="verb">keep demand</div><div class="stagelogos"><svg><use href="#lg-google"/></svg><svg><use href="#lg-ta"/></svg></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 TOTAL VISIBILITY -->
+  <section class="slide dark" data-name="Total Visibility">
+    <div class="wrap center">
+      <span class="eyebrow reveal"><span class="dotmk"></span> The system you already run with LOKAL</span>
+      <h1 class="title" style="margin:10px 0 8px"><span class="mask"><i style="--d:.12s">Total Visibility. <em class="it">One system.</em></i></span></h1>
+      <p class="lead wide reveal" style="--d:.28s;margin-bottom:36px">Three jobs decide every booking. Most tools show one. Yours shows all three — live.</p>
+      <div class="cols3" style="width:100%;text-align:left">
+        <div class="colitem reveal" style="--d:.4s"><div class="n">01 / Create demand</div><h3>Get discovered.</h3><p>Reach travelers who don't know you yet — search, social, maps, press.</p></div>
+        <div class="colitem reveal" style="--d:.52s"><div class="n">02 / Convert demand</div><h3>Win the compare.</h3><p>Show up when they choose — and take the booking before a booking site does.</p></div>
+        <div class="colitem reveal" style="--d:.64s"><div class="n">03 / Keep demand</div><h3>Own your name.</h3><p>When someone searches you by name, route them to you — where the margin lives.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 MEET THE DASHBOARD -->
+  <section class="slide dark" data-name="Meet the dashboard">
+    <div class="wrap split rev">
+      <div class="reveal fromL" style="--d:.3s">
+        <div class="browser">
+          <div class="bchrome"><span class="d" style="background:#ec6a5e"></span><span class="d" style="background:#f4bf4f"></span><span class="d" style="background:#61c554"></span>
+            <span class="url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> yourhotel.lokal.report</span></div>
+          <div class="screenwrap"><div class="pv" data-portal></div><img class="shot" src="hero-desktop.png" alt="" onerror="this.remove()"></div>
+        </div>
+      </div>
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> The dashboard</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">One link.</i></span><span class="mask"><i style="--d:.22s">The whole picture.</i></span></h1>
+        <p class="lead reveal" style="--d:.36s">No login. Nothing to learn. It refreshes itself — open it like a magazine, in plain English.</p>
+        <div class="chips reveal" style="--d:.48s"><span class="chip"><span class="ck">✓</span> No password</span><span class="chip"><span class="ck">✓</span> Any device</span><span class="chip"><span class="ck">✓</span> Updates itself</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 QUICK READ -->
+  <section class="slide" data-name="The quick read">
+    <div class="wrap">
+      <div class="stack" style="margin-bottom:34px">
+        <span class="eyebrow reveal"><span class="dotmk"></span> The quick read</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">Your week in ten seconds.</i></span></h1>
+        <p class="lead wide reveal" style="--d:.26s">Win, watch, risk — the whole story before your coffee's cold.</p>
+      </div>
+      <div class="swr">
+        <div class="it win reveal" style="--d:.36s"><div class="fl">Win</div><h3>Your name search is strong.</h3><p>Most people who search you reach your own site. Protect it.</p></div>
+        <div class="it watch reveal" style="--d:.48s"><div class="fl">Watch</div><h3>Fewer people saw you this week.</h3><p>Not urgent — but worth a look before it slips.</p></div>
+        <div class="it risk reveal" style="--d:.6s"><div class="fl">Risk</div><h3>A booking site is taking your clicks.</h3><p>Commission you don't need to pay. Here's where to win it back.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 CREATE DEMAND -->
+  <section class="slide" data-name="Create demand">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> 01 · Create demand</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">Are new travelers</i></span><span class="mask"><i style="--d:.22s">finding you?</i></span></h1>
+        <p class="lead reveal" style="--d:.36s">People who never knew you before — finding you through search, maps, press, and social. This is how your name grows.</p>
+      </div>
+      <div class="reveal fromR" style="--d:.34s">
+        <div class="stat statbig"><span data-count="2300">0</span></div>
+        <div class="stlabel">brand-new visitors found you this period</div>
+        <svg class="spark" viewBox="0 0 320 90" style="width:100%;max-width:360px;margin-top:18px" preserveAspectRatio="none">
+          <path class="f" d="M0,70 L30,64 60,66 90,52 120,55 150,40 180,44 210,30 240,33 270,20 300,16 320,12 L320,90 L0,90 Z"/>
+          <path class="l" pathLength="1" d="M0,70 L30,64 60,66 90,52 120,55 150,40 180,44 210,30 240,33 270,20 300,16 320,12"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 CONVERT DEMAND -->
+  <section class="slide dark" data-name="Convert demand">
+    <div class="wrap split rev">
+      <div class="reveal fromL" style="--d:.3s">
+        <div class="stlabel" style="margin-bottom:14px">Who gets the click when travelers compare</div>
+        <div class="bar"><i class="you" style="--w:22%"></i><i class="ota" style="--w:78%"></i></div>
+        <div class="barkey"><span><b>You — 22%</b></span><span>Booking sites — 78%</span></div>
+        <div class="stat statmed" style="margin-top:34px"><span data-count="2">0</span> <span style="font-size:1.6rem;color:var(--muted-d)">of 10</span></div>
+        <div class="stlabel">non-brand searches where you show up</div>
+      </div>
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> 02 · Convert demand</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">When they compare,</i></span><span class="mask"><i style="--d:.22s">do you win — or pay?</i></span></h1>
+        <p class="lead reveal" style="--d:.36s">Search "a hotel like yours" and a booking site usually grabs the click — then bills you up to 25% for a guest who was almost already yours. Every point you win back is margin you keep.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 KEEP DEMAND -->
+  <section class="slide" data-name="Keep demand">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> 03 · Keep demand</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">They searched your name.</i></span><span class="mask"><i style="--d:.22s">Did they reach you?</i></span></h1>
+        <p class="lead reveal" style="--d:.36s">Your own brand demand is the most valuable click you have. See how much of it reaches your site — and where the rest leaks.</p>
+      </div>
+      <div class="reveal fromR" style="--d:.34s">
+        <div class="stat statbig"><span data-count="352">0</span></div>
+        <div class="stlabel">people searched your hotel by name</div>
+        <div class="rule" style="--d:.5s;margin:22px 0"></div>
+        <p class="lead" style="font-size:1.05rem">Make sure they land on <em class="it">you</em> — not a booking site charging you to reach your own guest.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 AI ANSWERS -->
+  <section class="slide dark" data-name="AI answers">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> Validate · AI search</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">They ask AI where</i></span><span class="mask"><i style="--d:.22s">to stay. Does it</i></span><span class="mask it"><i style="--d:.32s">say <em class="it">you?</em></i></span></h1>
+        <p class="lead reveal" style="--d:.46s">More travelers ask ChatGPT, Perplexity, and Google's AI before they book. We track how often they name you — and cite your own site.</p>
+        <p class="reveal" style="--d:.58s;font-family:var(--sans);font-size:.92rem;color:var(--muted-d);max-width:42ch"><b style="color:var(--accent-2)">61% of hotels</b> in our Visibility Index have zero AI mentions on their own brand. We change that.</p>
+      </div>
+      <div class="reveal fromR" style="--d:.34s">
+        <div class="chatbox">
+          <div class="bub you" style="--d:.5s">Where should I stay near the beach this weekend?</div>
+          <div class="bub ai" style="--d:.9s">A great pick is <b>Your Hotel</b> — guests love the rooftop pool and the team. Steps from the shore. ★ 4.6</div>
+          <div class="chatft"><span class="chip" style="box-shadow:none"><span class="ck">✓</span> Named your hotel</span></div>
+        </div>
+        <div class="logorow" style="margin-top:18px">
+          <div class="lchip pop" style="--d:1.1s"><svg><use href="#lg-openai"/></svg><span>ChatGPT</span></div>
+          <div class="lchip pop" style="--d:1.2s"><svg><use href="#lg-perplexity"/></svg><span>Perplexity</span></div>
+          <div class="lchip pop" style="--d:1.3s"><svg><use href="#lg-google"/></svg><span>AI Overviews</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 REPUTATION -->
+  <section class="slide" data-name="Reputation">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> Reputation</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">What guests say,</i></span><span class="mask"><i style="--d:.22s">all in one place.</i></span></h1>
+        <p class="lead reveal" style="--d:.36s">Your rating across Google, TripAdvisor, and the booking sites — with the trend, new reviews, and how fast you reply.</p>
+        <div class="chips reveal" style="--d:.48s"><span class="chip"><b style="color:var(--accent-deep)">+12</b>&nbsp;new reviews</span><span class="chip">You reply to&nbsp;<b style="color:var(--accent-deep)">80%</b></span></div>
+        <p class="reveal" style="--d:.58s;font-family:var(--sans);font-size:.9rem;color:var(--muted);max-width:42ch">Replying is the fastest lever you control — we show the ones still waiting.</p>
+      </div>
+      <div class="center reveal fade" style="--d:.34s">
+        <div class="dial"><svg width="210" height="210" viewBox="0 0 210 210"><circle class="tk" cx="105" cy="105" r="85"/><circle class="arc" cx="105" cy="105" r="85"/></svg><div class="ctr"><div class="n"><span data-count="4.6" data-decimals="1">0</span></div><div class="s">out of 5 ★</div></div></div>
+        <p style="font-family:var(--sans);font-size:.82rem;color:var(--muted);margin-top:10px">Google · TripAdvisor · Booking</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 REPORTING -->
+  <section class="slide dark" data-name="Reporting">
+    <div class="wrap">
+      <div class="stack" style="margin-bottom:30px;max-width:60ch">
+        <span class="eyebrow reveal"><span class="dotmk"></span> Coming next week</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">It writes your</i></span><span class="mask it"><i style="--d:.22s">reports <em class="it">for you.</em></i></span></h1>
+        <p class="lead wide reveal" style="--d:.36s">No more waiting on a monthly deck. Your update comes to you — and turns into something you can present.</p>
+      </div>
+      <div class="split">
+        <div class="reveal fromL" style="--d:.46s">
+          <div class="emailmock">
+            <div class="eh"><div class="efrom"><span class="av">L</span> LOKAL · Your Hotel</div><div class="esub">Your weekly visibility update — Jun 1–7</div></div>
+            <div class="ebody"><div class="l">This week in 10 seconds</div>
+              <div class="erow"><b class="w">Win</b><span>Name search up — most reach your site.</span></div>
+              <div class="erow"><b class="t">Watch</b><span>Fewer people saw you this week.</span></div>
+              <div class="erow"><b class="r">Risk</b><span>A booking site is taking your clicks.</span></div>
+              <span class="ebtn">Open full report →</span></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="reveal fromR" style="--d:.4s"><div class="deckmock">
+            <div class="sl sl1"><div class="e">LOKAL</div><div class="t">Win the compare</div><div class="b"></div><div class="b b2"></div></div>
+            <div class="sl sl2"><div class="e">LOKAL</div><div class="t">AI says you</div><div class="b"></div><div class="b b2"></div></div>
+            <div class="sl sl3"><div class="e">Monthly report · Your Hotel</div><div class="t">Total Visibility.</div><div class="b"></div><div class="b b2"></div></div>
+          </div></div>
+          <div class="reveal" style="--d:.56s">
+            <h3 style="font-size:1.5rem;margin-bottom:8px">Two things, automatic</h3>
+            <p class="lead" style="font-size:1.02rem"><b style="color:var(--accent-2)">Weekly email</b> — your update lands in your inbox, on its own.<br><b style="color:var(--accent-2)">Monthly report as a deck</b> — ready to present to your team and owners.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 PROOF -->
+  <section class="slide" data-name="Proof">
+    <div class="wrap center">
+      <span class="eyebrow reveal"><span class="dotmk"></span> The track record</span>
+      <h1 class="title" style="margin:10px 0 34px"><span class="mask"><i style="--d:.12s">The system behind the numbers.</i></span></h1>
+      <div class="statrow reveal fade" style="--d:.3s;width:100%;margin-bottom:30px">
+        <div class="col"><div class="stat statmed"><span data-count="65">0</span><span class="u">+</span></div><div class="stlabel">Clients served</div></div>
+        <div class="col"><div class="stat statmed"><span data-count="100">0</span><span class="u">%</span></div><div class="stlabel">Retention since 2024</div></div>
+        <div class="col"><div class="stat statmed"><span data-count="9">0</span><span class="u">+</span></div><div class="stlabel">Years running</div></div>
+      </div>
+      <div class="rule reveal" style="--d:.4s"></div>
+      <div class="reveal" style="--d:.48s;margin-top:24px">
+        <div class="kicker" style="margin-bottom:18px">Hospitality Innovators, Inc. — 16+ properties · 2024–2026</div>
+        <div class="statrow" style="gap:40px">
+          <div><div class="stat statmed"><span data-count="41">0</span><span class="u">%</span></div><div class="stlabel">Less total ad spend</div></div>
+          <div><div class="stat statmed"><span data-count="61">0</span><span class="u">%</span></div><div class="stlabel">Lower cost per click</div></div>
+          <div><div class="stat statmed"><span data-count="195">0</span><span class="u">%</span></div><div class="stlabel">CTR lift on Google Ads</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 IT'S YOURS -->
+  <section class="slide dark" data-name="It's yours">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow reveal"><span class="dotmk"></span> It's yours</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">Private. Branded.</i></span><span class="mask"><i style="--d:.22s">Yours.</i></span></h1>
+        <p class="lead reveal" style="--d:.36s">It carries your hotel's name, logo, and colors. And every account behind it stays in your name — you own the data, always.</p>
+        <div class="chips reveal" style="--d:.48s"><span class="chip"><span class="ck">✓</span> Your branding</span><span class="chip"><span class="ck">✓</span> Only people you choose</span><span class="chip"><span class="ck">✓</span> You own it all</span></div>
+      </div>
+      <div class="center reveal fade" style="--d:.34s">
+        <div class="phone"><div class="pscreen"><div class="pill"></div><div class="screenwrap"><div class="pv" data-portal data-mobile></div><img class="shot" src="hero-mobile.png" alt="" onerror="this.remove()"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 ROADMAP -->
+  <section class="slide" data-name="Roadmap">
+    <div class="wrap">
+      <div class="stack center" style="margin-bottom:6px">
+        <span class="eyebrow reveal"><span class="dotmk"></span> What's coming next</span>
+        <h1 class="title"><span class="mask"><i style="--d:.12s">Today it shows you everything.</i></span><span class="mask it"><i style="--d:.22s">Next, it does the <em class="it">work.</em></i></span></h1>
+      </div>
+      <div class="road">
+        <div class="roadline"></div>
+        <div class="steps">
+          <div class="step now" style="--i:0"><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg></div><div class="when">Now</div><h4>The dashboard</h4><p>Your whole online picture in one place.</p><div class="badge"><span>● Live today</span></div></div>
+          <div class="step next" style="--i:1"><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg></div><div class="when">Next week</div><h4>Reports that come to you</h4><p>Auto weekly email + a monthly report you can present.</p></div>
+          <div class="step then" style="--i:2"><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/></svg></div><div class="when">Then</div><h4>Your AI chatbot</h4><p>Answers guest questions for you — built into the dashboard.</p></div>
+          <div class="step then" style="--i:3"><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="when">Then</div><h4>To-dos that come to you</h4><p>The chatbot turns guest chats into tasks and action items.</p></div>
+          <div class="step later" style="--i:4"><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M7 7V4h10v3M12 7v10"/></svg></div><div class="when">Later</div><h4>Connected to bookings</h4><p>Linked to your booking system (PMS) — everything in one place.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 CLOSING -->
+  <section class="slide dark" data-name="Closing">
+    <div class="wrap center">
+      <span class="eyebrow reveal"><span class="dotmk"></span> LOKAL · Total Visibility</span>
+      <h1 class="display" style="margin:14px 0"><span class="mask"><i style="--d:.14s">Be the answer,</i></span><span class="mask"><i style="--d:.26s">not a result<b class="pd">.</b></i></span></h1>
+      <p class="reveal quote" style="--d:.42s;font-size:1.3rem">Your Total Visibility, alive — in one link.</p>
+      <div class="reveal" style="--d:.56s"><div class="cta">Ask your LOKAL principal to open yours
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+      <div class="contacts reveal" style="--d:.66s">Manila · Sydney&nbsp;&nbsp;—&nbsp;&nbsp;lkl.ai</div>
+    </div>
+  </section>
+
+</div>
+
+<div class="scene" id="scene"></div>
+<div class="dots" id="dots"></div>
+<div class="arrows">
+  <div class="arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+  <div class="arrow" id="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+</div>
+
+<template id="portalTpl">
+  <div class="ph"><div class="mono">YH</div><div><div class="pn">Your Hotel</div><div class="ps">Edition · Week of Jun 1–7</div></div><div class="ptabs"><span class="live">Live</span><b>Weekly</b><span>Monthly</span></div></div>
+  <div class="pb">
+    <div class="ph1">Your name search is strong — but a booking site is taking <em>clicks</em>.</div>
+    <div class="pswr"><div class="pc w"><span>Win</span><p>Name search strong</p></div><div class="pc t"><span>Watch</span><p>Fewer views</p></div><div class="pc r"><span>Risk</span><p>Clicks leaking</p></div></div>
+    <div class="pmetric"><div><div class="big">352</div><div class="lab">Brand-search clicks</div></div>
+      <svg viewBox="0 0 120 38" preserveAspectRatio="none"><polyline pathLength="1" points="0,30 15,26 30,28 45,18 60,21 75,12 90,15 105,7 120,5" fill="none" stroke="#C4933F" stroke-width="2"/></svg></div>
+    <div class="psplit"><div class="lab"><span>Who gets the click</span><span>You 22% · OTA 78%</span></div>
+      <div class="track"><b class="a" style="width:22%"></b><b class="o" style="width:78%"></b></div></div>
+  </div>
+</template>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dotsWrap=document.getElementById('dots'),progress=document.getElementById('progress');
+  var curEl=document.getElementById('cur'),totEl=document.getElementById('tot'),sceneEl=document.getElementById('scene');
+  var i=0, tpl=document.getElementById('portalTpl');
+  document.querySelectorAll('[data-portal]').forEach(function(p){ p.appendChild(tpl.content.cloneNode(true)); });
+  totEl.textContent=String(slides.length).padStart(2,'0');
+  slides.forEach(function(s,idx){ var d=document.createElement('div'); d.className='dot'; d.addEventListener('click',function(){go(idx);}); dotsWrap.appendChild(d); });
+  var dots=[].slice.call(dotsWrap.children);
+
+  function countUp(slide){
+    slide.querySelectorAll('[data-count]').forEach(function(el){
+      var target=parseFloat(el.getAttribute('data-count')),dec=parseInt(el.getAttribute('data-decimals')||'0',10),big=target>=1000,dur=1150,t0=null;
+      function fmt(v){ if(big)return (v/1000).toFixed(1).replace(/\.0$/,'')+'k'; return dec?v.toFixed(dec):Math.round(v).toLocaleString(); }
+      function step(ts){ if(!t0)t0=ts; var p=Math.min((ts-t0)/dur,1),e=1-Math.pow(1-p,3); el.textContent=fmt(target*e); if(p<1)requestAnimationFrame(step); else el.textContent=fmt(target); }
+      el.textContent=fmt(0); requestAnimationFrame(step);
+    });
+  }
+  function go(n){
+    n=Math.max(0,Math.min(slides.length-1,n));
+    slides[i].classList.remove('active'); i=n; slides[i].classList.add('active');
+    dots.forEach(function(d,idx){ d.classList.toggle('on',idx===i); });
+    progress.style.width=(i/(slides.length-1)*100)+'%';
+    curEl.textContent=String(i+1).padStart(2,'0');
+    sceneEl.textContent=String(i+1).padStart(2,'0')+' · '+(slides[i].getAttribute('data-name')||'');
+    countUp(slides[i]);
+  }
+  function next(){go(i+1);} function prev(){go(i-1);}
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prev);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+    else if(e.key==='Home'){go(0);} else if(e.key==='End'){go(slides.length-1);}
+  });
+  var x0=null;
+  document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',function(e){ if(x0===null)return; var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>50){dx<0?next():prev();} x0=null; },{passive:true});
+  requestAnimationFrame(function(){ go(0); });
+})();
+</script>
+</body>
+</html>
