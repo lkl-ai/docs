@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HII Partnership Strategy — LOKAL Internal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root{--n900:#0F172A;--n800:#1E293B;--n700:#334155;--n500:#64748B;--n400:#94A3B8;--n300:#CBD5E1;--n200:#E2E8F0;--n100:#F1F5F9;--n50:#F8FAFC;--t600:#0D9488;--t700:#0F766E;--t100:#CCFBF1;--t50:#F0FDFA;--a600:#D97706;--a100:#FEF3C7;--r600:#DC2626;--r100:#FEE2E2;--p600:#7C3AED;--p100:#EDE9FE;--b600:#2563EB;--b100:#DBEAFE;--w:#FFF}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--n900);line-height:1.7;background:var(--w)}
+.cover{background:var(--n900);padding:72px 48px 56px;color:var(--w)}
+.cover-in{max-width:780px;margin:0 auto}
+.badge{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t600);border:1px solid rgba(13,148,136,.3);border-radius:100px;padding:4px 16px;margin-bottom:32px;font-weight:600}
+.cover h1{font-size:36px;font-weight:800;line-height:1.15;margin-bottom:16px;letter-spacing:-.5px}
+.cover h1 span{color:var(--t600)}
+.cover .sub{font-size:16px;color:var(--n400);max-width:620px;margin-bottom:32px}
+.cover-meta{display:flex;gap:28px;font-size:11px;color:var(--n500);flex-wrap:wrap}
+.cover-meta b{color:var(--n300);font-weight:500}
+.w{max-width:780px;margin:0 auto;padding:0 48px}
+.s{padding:56px 0;border-bottom:1px solid var(--n100)}
+.s:last-child{border-bottom:none}
+.sn{font-size:10px;font-weight:700;color:var(--t600);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.s h2{font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.s .lead{font-size:14px;color:var(--n500);margin-bottom:28px}
+.s h3{font-size:16px;font-weight:700;margin:32px 0 10px}
+.s p{font-size:14px;color:var(--n700);margin-bottom:12px}
+.box{border-radius:10px;padding:20px 24px;margin:20px 0;font-size:13px;line-height:1.7}
+.box b{font-weight:600}
+.box-g{background:var(--n50);border:1px solid var(--n100);color:var(--n700)}
+.box-t{background:var(--t50);border:1px solid var(--t100);color:var(--n700)}
+.box-a{background:var(--a100);border:1px solid #FDE68A;color:var(--n700)}
+.box-r{background:var(--r100);border:1px solid #FECACA;color:var(--n700)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.gc{background:var(--n50);border:1px solid var(--n100);border-radius:10px;padding:18px 20px}
+.gc h4{font-size:13px;font-weight:700;margin-bottom:6px}
+.gc p{font-size:12px;color:var(--n500);margin:0;line-height:1.6}
+.play{border:1px solid var(--n200);border-radius:12px;padding:24px 28px;margin:14px 0;position:relative}
+.play-n{position:absolute;top:18px;right:22px;font-size:44px;font-weight:800;color:var(--n100);line-height:1}
+.play h4{font-size:16px;font-weight:700;margin-bottom:2px}
+.play .ps{font-size:11px;font-weight:600;color:var(--t600);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.play p{font-size:13px;color:var(--n700);margin-bottom:8px;line-height:1.7}
+.it{font-size:12px;color:var(--n500);font-style:italic}
+.tb{width:100%;border-collapse:collapse;font-size:12px;margin:20px 0}
+.tb caption{text-align:left;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--n900)}
+.tb th{background:var(--n50);padding:8px 12px;text-align:left;font-weight:600;font-size:11px;color:var(--n500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--n200)}
+.tb td{padding:10px 12px;border-bottom:1px solid var(--n100);vertical-align:top;line-height:1.6;color:var(--n500)}
+.tb td:first-child{font-weight:600;color:var(--n900);min-width:140px}
+.tb .grp{background:var(--n50)}
+.tb .grp td{font-weight:600;font-size:11px;color:var(--n500);text-transform:uppercase;letter-spacing:.5px;padding:6px 12px}
+.hv{color:var(--n900);font-weight:600}
+.tl{position:relative;margin:28px 0;padding-left:22px}
+.tl::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--t600),var(--a600))}
+.tl-i{position:relative;margin-bottom:24px}
+.tl-i:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-19px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--t600);border:2px solid var(--w);box-shadow:0 0 0 2px var(--t600)}
+.tl-ph{font-size:10px;font-weight:700;color:var(--t600);text-transform:uppercase;letter-spacing:1.5px}
+.tl-t{font-size:14px;font-weight:700;margin:2px 0 4px}
+.tl-d{font-size:12px;color:var(--n500);line-height:1.7}
+.ns-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.ns{background:var(--w);border:1px solid var(--n200);border-radius:10px;padding:20px}
+.ns-num{font-size:36px;font-weight:800;color:var(--n100);line-height:1;margin-bottom:8px}
+.ns h4{font-size:13px;font-weight:700;margin-bottom:4px}
+.ns p{font-size:12px;color:var(--n500);margin:0;line-height:1.6}
+.foot{background:var(--n900);padding:36px 48px;text-align:center;font-size:12px;color:var(--n500)}
+.foot b{color:var(--n300);font-weight:500}
+@media(max-width:700px){.grid,.ns-grid{grid-template-columns:1fr}.w{padding:0 24px}.cover{padding:48px 24px}.cover h1{font-size:26px}}
+@media print{.cover{page-break-after:always}.s{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="cover-in">
+<div class="badge">LOKAL internal — not for HII</div>
+<h1>Expanding the HII Partnership:<br><span>What We're Proposing, What It Costs Us, What We Get</span></h1>
+<p class="sub">HII is our biggest client at ₱400k/month across 16 properties. This document lays out the full picture of what we're building together, what each side contributes, where the imbalance is, and what we should be asking for. For discussion with RK and CJ before we go back to Dinna.</p>
+<div class="cover-meta">
+<div><b>Author:</b> Joshua</div>
+<div><b>For:</b> RK, CJ, LOKAL leadership</div>
+<div><b>Based on:</b> June 5 meetings with Dinna, Niño, John, Jennifer, Vicky</div>
+<div><b>Date:</b> June 2026</div>
+</div>
+</div></div>
+
+<div class="w">
+
+<!-- ═══ 1. SITUATION ═══ -->
+<div class="s">
+<div class="sn">01 — Situation</div>
+<h2>Where we are with HII</h2>
+<p class="lead">The relationship, what they're asking for, and the strategic shifts driving this.</p>
+
+<div class="grid">
+<div class="gc"><h4>Current relationship</h4><p>₱400k/month across 16 properties. Marketing services — SEO, content, social, paid ads. AI training completed across portfolio. Eli chatbot demonstrated to leadership. Marketing portal launching next week. Lead: Jasmine. Pod: HII.</p></div>
+<div class="gc"><h4>Key contacts</h4><p><b>Dinna De Guzman</b> — strategic decisions, asked for the proposal.<br><b>Niño Reantaso</b> — RDS pricing, service packaging.<br><b>John Cruz</b> — operations, tech decisions.<br><b>Jennifer Conde</b> — guest comms, meta responses.<br><b>Vicky Delfin</b> — senior leadership, Australia contacts.</p></div>
+</div>
+
+<h3>Three strategic shifts from the June 5 conversations</h3>
+
+<div class="box box-t">
+<b>1. HII is expanding beyond full management.</b> They're moving into Revenue Distribution Services (RDS) — à la carte marketing and revenue packages for smaller properties (15–50 keys) that can't justify a full management company. This is their H2 2026 priority. They need a tech and marketing stack to bundle into this offering. That's us.
+</div>
+
+<div class="box box-t">
+<b>2. Our technology is production-ready.</b> Eli AI concierge is built and demoed. Marketing portal launches next week. Booking engine is scoped. We have a real tech stack to offer — not a roadmap, not a pitch, working products.
+</div>
+
+<div class="box box-a">
+<b>3. Kokotel is forcing the timeline.</b> Japanese-backed, Thai-operated hotel management company aggressively entering the Philippines. Full digital-first suite — distribution, marketing, management. John flagged them specifically: leads that previously approached HII are now signing with Kokotel. HII needs a technology-forward response. We're that response.
+</div>
+
+<div class="box box-g">
+<b>What Dinna explicitly asked for:</b> HII brand website audit + SEO. A proposal for co-marketing activities. Pricing for Eli rollout. RDS packaging discussion with Niño. Data privacy questionnaire. Her words: "Give us a proposal."
+</div>
+</div>
+
+<!-- ═══ 2. NORTH STAR ═══ -->
+<div class="s">
+<div class="sn">02 — Why this matters</div>
+<h2>How this ties to LOKAL's North Stars</h2>
+<p class="lead">This partnership isn't a revenue moonshot. It's the primary vehicle for the Service-as-a-Software transition.</p>
+
+<div class="grid">
+<div class="gc"><h4>MRR</h4><p>₱400k/month protected (defensive moat through deeper integration). Upsell to ~₱500–550k with AI products. More importantly: co-marketing engine (Academy, newsletter, roundtables) generates pipeline for new hotel clients at ₱25–50k MRR each.</p></div>
+<div class="gc"><h4>Gross margin</h4><p><b>This is the big one.</b> Current ₱400k is services — human time, low margin. Every AI product shifts the delivery from labor to software. Same revenue, lower cost to deliver. GM copilot, voice AI, Eli — all software-economics. The path from ~40% margin to 70%+ runs through HII.</p></div>
+<div class="gc"><h4>AI-delivered %</h4><p>Every AI product directly increases this. Copilot replaces human reporting. Voice AI replaces human phone answering. Eli replaces human chat. Cross-property intel replaces manual CRM. HII's 16 properties give us the proof point: "X% of guest communication is now AI-delivered."</p></div>
+<div class="gc"><h4>Direct booking %</h4><p>Booking engine at Club Nalu is the direct play. Eli chat-to-booking conversion is the other. Rev-share model (if we pursue it) aligns our incentive directly with this metric. HII's 16 properties are a huge chunk of our denominator — moving their direct ratio moves our North Star.</p></div>
+</div>
+
+<div class="box box-g">
+<b>The real story:</b> HII is the lab where we prove Service-as-a-Software works. We're using their portfolio to build and validate the products that turn LOKAL from a services company into a software-delivered services company. The AI products we build here get packaged and sold to every hotel after. HII pays for services today while we build the software that delivers the same value tomorrow at 80%+ margin.
+</div>
+</div>
+
+<!-- ═══ 3. TABLE STAKES ═══ -->
+<div class="s">
+<div class="sn">03 — Table stakes</div>
+<h2>What's already committed or obvious</h2>
+<p class="lead">Doing these regardless. Not the differentiators.</p>
+
+<table class="tb">
+<thead><tr><th>Activity</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Eli AI rollout</td><td>Starting — Costa Solana + Club Nalu first</td><td>₱2–5k/property/month. Phased across 16 properties. Tiered by size/usage.</td></tr>
+<tr><td>Marketing portal</td><td>Launching next week</td><td>Phase 1 of tech rollout. All HII properties get dashboards.</td></tr>
+<tr><td>HII website audit + SEO</td><td>Delivering in 2 weeks</td><td>UX audit + content marketing strategy for hii.com.ph. No paid ads — inbound/relationship approach.</td></tr>
+<tr><td>Booking engine pilot</td><td>Development Q3</td><td>Club Nalu (15 rooms, IDB PMS). Test by September.</td></tr>
+<tr><td>RDS packaging</td><td>Workshop needed with Niño</td><td>Define service tiers and pricing for smaller properties.</td></tr>
+<tr><td>Digital Readiness Playbook</td><td>Research July, publish August</td><td>Co-branded study. Works as external marketing AND HII's internal BD sales tool.</td></tr>
+<tr><td>Adobe Magazine coordination</td><td>Feature coming in weeks</td><td>HII highlighted as flagship client. Joint PR amplification.</td></tr>
+<tr><td>Data privacy questionnaire</td><td>Return to Jennifer's team</td><td>Required before Eli deployment.</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══ 4. AI PRODUCTS ═══ -->
+<div class="s">
+<div class="sn">04 — AI products</div>
+<h2>Built inside HII's portfolio, sold to the market</h2>
+<p class="lead">16 live hotels is a development lab. Everything that works gets packaged.</p>
+
+<div class="play">
+<div class="play-n">01</div>
+<h4>GM operations copilot</h4>
+<div class="ps">Chat-based hotel performance intelligence</div>
+<p>GM opens a chat, asks "how did we do this week?" — instant analysis of occupancy, revenue, guest sentiment, social mentions, Eli trends, competitor pricing. Replaces hours of manual weekly reporting across 16 properties.</p>
+<p>Extension of the marketing portal. Could be a premium tier. Test at Club Nalu, roll to portfolio, then sell as standalone to non-HII hotels.</p>
+<p class="it">Dependency: IDB PMS API access. If the API is weak, this stalls. Scope integration first. Confidence: 75% if data pipeline works.</p>
+</div>
+
+<div class="play">
+<div class="play-n">02</div>
+<h4>Voice AI for phone inquiries</h4>
+<div class="ps">Eli answers the phone — 24/7</div>
+<p>Voice version of Eli that handles phone calls in natural conversation. FAQs, booking inquiries, directions, hours. Escalates to human for complex requests. No Philippine hotel management company offers this.</p>
+<p>Test at one English-heavy property first (Aurora Subic or Harvest Hotel). Quality bar is high — robotic voice = brand damage.</p>
+<p class="it">Risk: Taglish/Filipino language mixing could be rough with current voice AI. Start English-only. Confidence: 50% for broad deployment, higher for English-tourist-heavy properties.</p>
+</div>
+
+<div class="play">
+<div class="play-n">03</div>
+<h4>Cross-property guest intelligence</h4>
+<div class="ps">Shared AI memory across the portfolio</div>
+<p>Guest preferences, communication history, and booking patterns travel across all 16 HII properties. Boracay guest who likes quiet rooms → flagged at The Connor six months later.</p>
+<p>Only works with a multi-property portfolio and a shared AI layer. Genuine competitive moat. But value depends on cross-property repeat booking rate — if only 2% of guests book multiple HII properties, the infrastructure serves a thin use case. Needs to be paired with active cross-selling (post-stay emails promoting other HII destinations).</p>
+<p class="it">Dependency: PMS guest data access across properties. Privacy/consent framework. Confidence: 35% standalone, 65% if paired with cross-property marketing program.</p>
+</div>
+</div>
+
+<!-- ═══ 5. CO-MARKETING ═══ -->
+<div class="s">
+<div class="sn">05 — Co-marketing</div>
+<h2>The joint activities</h2>
+<p class="lead">These are the ones we've selected. Each genuinely requires both companies.</p>
+
+<div class="play">
+<h4>Joint industry newsletter</h4>
+<div class="ps">Monthly — "The Hotel Innovator"</div>
+<p>Co-branded monthly email. Mix of industry data (from the Readiness Study), quick tips, HII property spotlight, tech insight. Goes to HII's entire contact database + LOKAL's hotel prospect list. Builds a shared email list over time.</p>
+<p>This is lead nurture, not lead generation. Slow burn. Compound effect over 6–12 months. Low cost — LOKAL's content engine generates 80% automatically.</p>
+</div>
+
+<div class="play">
+<h4>Executive LinkedIn content for HII leadership</h4>
+<div class="ps">Ghostwritten thought leadership — 2-3 posts/week</div>
+<p>LOKAL ghostwrites for Dinna, John, and/or Vicky. Topics: AI in hospitality, industry trends, property highlights. Voice-matched via Brand Engine.</p>
+<p>Property owners are on LinkedIn. CBRE is on LinkedIn. Real estate investors are on LinkedIn. When Dinna posts about how Costa Solana handled 1,700 monthly inquiries with AI, her network sees it. Cheapest, most targeted lead gen for this market.</p>
+</div>
+
+<div class="play">
+<h4>Hospitality AI Academy</h4>
+<div class="ps">Paid workshops — or a version of it</div>
+<p>Productize the AI training we already deliver to HII staff. 2-day intensive for hotel marketing teams. AI content creation, chatbot deployment, SEO/AEO, social automation, review management. Certifications. Sold to non-HII hotels.</p>
+<p>The Trojan horse: we're not pitching services — we're teaching hotel owners how bad their digital presence is, using our tools to show them. By end of workshop, they've self-diagnosed. Our sales team follows up. HII's sales team follows up.</p>
+<p>We already have the content (20+ training deals in Pipedrive). Hosted at HII properties — beautiful venues, real hotel environments for hands-on practice. HII exec co-presents for credibility.</p>
+<p class="it">Open question: pricing. ₱8–15k/head is the target but PH hotel training market is price-sensitive. May need free intro sessions first, then paid advanced workshops.</p>
+</div>
+</div>
+
+<!-- ═══ 6. REQUIREMENTS ═══ -->
+<div class="s">
+<div class="sn">06 — Who does what</div>
+<h2>Full requirements breakdown</h2>
+<p class="lead">Everything mapped. What LOKAL provides vs. what HII provides.</p>
+
+<table class="tb">
+<caption>Table stakes + ongoing services</caption>
+<thead><tr><th style="width:20%">Activity</th><th style="width:40%">LOKAL provides</th><th style="width:40%">HII provides</th></tr></thead>
+<tbody>
+<tr class="grp"><td colspan="3">Technology deployments</td></tr>
+<tr><td>Eli AI rollout</td><td class="hv">Build, configure, deploy, host, maintain. Knowledge base per property. Token/hosting costs. Human-in-the-loop backend. Monthly reporting.</td><td>Property-specific knowledge (FAQs, rates, policies). Staff time for testing. Accuracy feedback. Privacy questionnaire. Teams integration.</td></tr>
+<tr><td>Marketing portal</td><td class="hv">Full platform build, hosting, data integrations, maintenance, staff training.</td><td>GA4/social account access per property. Staff attendance at training.</td></tr>
+<tr><td>HII website audit + SEO</td><td class="hv">Full UX/UI audit. SEO strategy. Content plan. Ongoing content production.</td><td>Brand guidelines. Approval cycles. Subject matter input.</td></tr>
+<tr><td>Booking engine</td><td class="hv">Full development. IDB integration. Payment setup. Testing. Hosting. Maintenance.</td><td class="hv">Club Nalu as test property. GM actively testing. IDB vendor intro. Real booking data.</td></tr>
+<tr><td>RDS packaging</td><td>Tech/marketing pricing input. Service descriptions. Capacity planning.</td><td class="hv">Niño leads pricing workshop. Defines operational tiers. Owns client model. Sets rev split.</td></tr>
+<tr class="grp"><td colspan="3">Marketing services (existing ₱400k/mo)</td></tr>
+<tr><td>SEO, content, social, ads</td><td class="hv">Full execution across 16 properties. Team time. Ad management. Content production. Reporting.</td><td>Brand approvals. Property updates. Rate changes. Ad budget (separate).</td></tr>
+</tbody>
+</table>
+
+<table class="tb">
+<caption>AI products</caption>
+<thead><tr><th style="width:20%">Product</th><th style="width:40%">LOKAL provides</th><th style="width:40%">HII provides</th></tr></thead>
+<tbody>
+<tr><td>GM copilot</td><td class="hv">Full build. AI integration. Data pipelines. Dashboard UI. Hosting. Maintenance. Iteration.</td><td class="hv">PMS data access (IDB API). Review platform credentials. Club Nalu GM as daily tester. IDB vendor introduction.</td></tr>
+<tr><td>Voice AI</td><td class="hv">Voice AI development. Telephony/SIP integration. Knowledge config. Quality testing. Hosting.</td><td class="hv">Test property. Phone system access. Staff to evaluate call quality daily during pilot. Call volume data.</td></tr>
+<tr><td>Cross-property intel</td><td class="hv">AI architecture. Guest identity matching. Preference extraction. Recommendation engine.</td><td class="hv">PMS guest data across properties. Privacy/consent approval. Staff training on preference flags. Active cross-selling execution.</td></tr>
+</tbody>
+</table>
+
+<table class="tb">
+<caption>Co-marketing activities</caption>
+<thead><tr><th style="width:20%">Activity</th><th style="width:40%">LOKAL provides</th><th style="width:40%">HII provides</th></tr></thead>
+<tbody>
+<tr><td>Newsletter</td><td class="hv">Content (80%). Design. Email platform. LOKAL list distribution. Analytics.</td><td>Operational insights (20%). HII database distribution. Approval per issue.</td></tr>
+<tr><td>LinkedIn program</td><td class="hv">Ghostwriting 2-3x/week. Voice matching. Content calendar. Tracking.</td><td>2-3 execs participate. ~30 min/week for voice notes. Async post approval.</td></tr>
+<tr><td>AI Academy</td><td class="hv">Curriculum. Teaching materials. AI tool access. Marketing + registration. Follow-up sequences.</td><td class="hv">Venue (host property — free). Accommodation (discounted). F&B for workshop. 1-2 execs as co-presenters. Operational curriculum input. Real hotel for hands-on exercises. Network promotion.</td></tr>
+<tr><td>Readiness Playbook</td><td class="hv">Scoring methodology. Fenrir audits. Analysis. Design. Production. PR distribution.</td><td>Industry context. Expert commentary. Luis Monserrat foreword. HII network distribution.</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══ 7. IMBALANCE ═══ -->
+<div class="s">
+<div class="sn">07 — The honest assessment</div>
+<h2>The imbalance — and what to do about it</h2>
+<p class="lead">Laying it out straight for the partners.</p>
+
+<div class="box box-r">
+<b>LOKAL is doing ~80% of the work.</b> All technology — build, host, maintain. All content production. All data analysis and AI development. Marketing execution. Email platforms. Workshop curriculum. Follow-up sequences. This is 3-4 team members' worth of capacity plus significant dev time on AI products.
+</div>
+
+<div class="box box-g">
+<b>HII is providing access to assets they already have.</b> Properties (empty function rooms), people (in slack hours), data (that sits in systems anyway), a contact list (that already exists), and brand credibility (that costs them nothing to lend). Their marginal cost is low. Our marginal cost is high.
+</div>
+
+<p>HII's contribution is <b>necessary</b> — we can't do any of this without their data, venues, and credibility. But necessary is not proportional. They're lending keys to rooms that are already empty. We're building products from scratch.</p>
+
+<h3>What we get despite the imbalance</h3>
+
+<div class="grid">
+<div class="gc"><h4>Defensive moat</h4><p>Protect the ₱4.8M/year. AI products baked into their operations make it progressively harder for HII to leave or replace us. A chatbot is a widget. A GM copilot their managers rely on daily is infrastructure.</p></div>
+<div class="gc"><h4>Service-as-a-Software proof</h4><p>The 16-property portfolio is where we prove the model works. Real data, real metrics, real case study. This proof is what lets us sell the next 50 hotels at software margins.</p></div>
+<div class="gc"><h4>Modest upsell</h4><p>₱400k → ~₱500-550k/month. ₱80-120k in new AI product subscriptions. Not transformative, but real incremental revenue at high margin.</p></div>
+<div class="gc"><h4>Lead generation pipeline</h4><p>Academy, newsletter, LinkedIn, Readiness Playbook — all generate warm leads for new hotel clients. 3-4 new hotels over 6 months = ₱100-200k/month new MRR.</p></div>
+</div>
+
+<h3>What we should ask for to rebalance</h3>
+
+<div class="play">
+<h4>1. Financial co-investment</h4>
+<p>HII co-funds the Digital Readiness Study, Academy launch costs, and any summit/event production. These activities generate leads for HII's management business too — they should pay for part of the lead gen. Not 50/50 necessarily, but skin in the game.</p>
+</div>
+
+<div class="play">
+<h4>2. Dedicated HII counterpart</h4>
+<p>Not "Dinna when she has time." A named person whose job includes this partnership — attends planning calls, owns guest lists, coordinates venues, is accountable for HII's deliverables. Without this, everything depends on busy executives fitting it in around their real jobs, and HII's side consistently slips.</p>
+</div>
+
+<div class="play">
+<h4>3. Exclusivity on marketing + tech</h4>
+<p>If we're building AI products inside their portfolio and the RDS tech stack they sell to new clients, we should be the exclusive marketing/technology partner. No shopping around. No "let's also talk to this other agency." Lock it in for the duration of the partnership.</p>
+</div>
+
+<div class="play">
+<h4>4. Revenue commitment on RDS</h4>
+<p>When HII signs RDS clients using the tech stack we built, LOKAL isn't a vendor they can negotiate down. Lock in the revenue split upfront — before the first RDS client signs. We built the products. We should have a guaranteed position in the commercial model.</p>
+</div>
+
+<div class="play">
+<h4>5. Equity or rev-share on AI products</h4>
+<p>If the GM copilot, voice AI, or cross-property intelligence become products HII uses to win new management contracts, we should participate in that upside. Not just a flat fee for the software — a share of the value it creates. This is the JV conversation.</p>
+</div>
+
+<div class="play">
+<h4>6. Full use of their physical assets</h4>
+<p>Free venues for all co-marketing events (roundtables, Academy, summit). Discounted/comp accommodation for attendees and LOKAL team travel. F&B for all events at cost. Properties as content production locations (video, photo). Work Folk co-working access for LOKAL Manila activities. This is low-cost for HII (empty rooms, existing kitchens) but ₱200-300k/month in value if we had to pay market rates.</p>
+</div>
+
+<div class="play">
+<h4>7. Permission to tell the story — publicly, with real data</h4>
+<p>Case studies, video series, Readiness Playbook, Academy materials — all depend on being able to say "we do this for HII's 16 properties and here are the results." Real numbers. Real property names. Real before-and-after. Explicit agreement upfront, not asked for permission case by case.</p>
+</div>
+</div>
+
+<!-- ═══ 8. TIMELINE ═══ -->
+<div class="s">
+<div class="sn">08 — Sequence</div>
+<h2>90-day plan</h2>
+<p class="lead">What happens when.</p>
+
+<div class="tl">
+<div class="tl-i">
+<div class="tl-dot"></div>
+<div class="tl-ph">Weeks 1–2 · Now</div>
+<div class="tl-t">Deliver what's promised</div>
+<div class="tl-d">Launch portal. Deliver HII website audit. Return data privacy docs. Deploy Eli at Costa Solana + Club Nalu. Schedule RDS workshop with Niño. Internal alignment with RK + CJ on this strategy. Then send Dinna the external proposal.</div>
+</div>
+<div class="tl-i">
+<div class="tl-dot"></div>
+<div class="tl-ph">Weeks 3–4</div>
+<div class="tl-t">Start the co-marketing engine</div>
+<div class="tl-d">Newsletter #1. LinkedIn ghostwriting begins. Readiness Study methodology finalized. Adobe Magazine PR coordination. Scope IDB API access for GM copilot (critical path item). Begin voice AI pilot scoping.</div>
+</div>
+<div class="tl-i">
+<div class="tl-dot"></div>
+<div class="tl-ph">Weeks 5–8</div>
+<div class="tl-t">Build and test</div>
+<div class="tl-d">Eli rollout to remaining properties. Booking engine dev sprint. Readiness Study data collection. GM copilot prototype on Club Nalu data. Voice AI pilot at one property. First Academy workshop planned (venue, curriculum, promo).</div>
+</div>
+<div class="tl-i">
+<div class="tl-dot"></div>
+<div class="tl-ph">Weeks 9–12</div>
+<div class="tl-t">Launch and prove</div>
+<div class="tl-d">Publish Readiness Study + PR blitz. First AI Academy workshop. Booking engine pilot at Club Nalu. GM copilot live (if IDB data works). First RDS pitch to external prospect. Schedule Gold Coast discussion with Vicky.</div>
+</div>
+</div>
+</div>
+
+<!-- ═══ 9. DECISIONS ═══ -->
+<div class="s">
+<div class="sn">09 — Decisions</div>
+<h2>What we need to align on before going back to HII</h2>
+<p class="lead">Questions for RK and CJ.</p>
+
+<div class="ns-grid">
+<div class="ns"><div class="ns-num">01</div><h4>How hard do we push on exclusivity?</h4><p>If we're building their RDS tech stack and AI products, we should be exclusive. But asking for exclusivity changes the tone from "partnership" to "lock-in." How aggressive do we want to be?</p></div>
+<div class="ns"><div class="ns-num">02</div><h4>JV or contract?</h4><p>A JV formalizes shared IP and upside on the AI products. A contract keeps it flexible. JV makes sense if we believe this is a 3-5 year play. Contract if we want to stay nimble.</p></div>
+<div class="ns"><div class="ns-num">03</div><h4>Rev-share or flat fees for AI products?</h4><p>Rev-share on direct bookings aligns incentives and removes budget objections. But it's variable and harder to forecast. Flat subscription is predictable MRR. Could offer both — let properties choose.</p></div>
+<div class="ns"><div class="ns-num">04</div><h4>How much do we ask HII to co-fund?</h4><p>The study, the Academy launch, summit costs. Do we ask for 50/50? 30/70? Or do we eat the cost and treat it as marketing investment for the leads it generates?</p></div>
+<div class="ns"><div class="ns-num">05</div><h4>What goes in Dinna's proposal?</h4><p>She asked for one. What do we commit to, what do we present as options, what do we hold back? Do we lead with the co-marketing or the AI products? How much of the "ask" do we put in writing vs. discuss verbally?</p></div>
+<div class="ns"><div class="ns-num">06</div><h4>Team capacity</h4><p>This is 3-4 team members' worth of capacity plus dev time. Do we have it? What deprioritizes? Or does HII's ₱400k/month justify dedicated resourcing?</p></div>
+</div>
+</div>
+
+</div>
+
+<div class="foot">
+<b>LOKAL × HII Partnership Strategy</b> — Internal document, June 2026<br>
+For discussion between Joshua, RK, and CJ before external proposal to HII
+</div>
+
+</body>
+</html>
