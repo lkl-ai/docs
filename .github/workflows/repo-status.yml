@@ -1,0 +1,64 @@
+name: Repo Status
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 19 * * *' # 05:00 Sydney (UTC+10 standard, +11 DST — close enough)
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: repo-status
+  cancel-in-progress: false
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Generate STATUS.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/generate-status.sh
+
+      - name: Commit if changed
+        run: |
+          if [[ -z "$(git status --porcelain STATUS.md)" ]]; then
+            echo "STATUS.md unchanged — nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add STATUS.md
+          git commit -m "chore: update STATUS.md [skip ci]"
+          # Rebase on top of any commit that landed on the active branch
+          # while this job was running, then retry a handful of times. Without
+          # this, a commit arriving mid-workflow makes `git push` fail with a
+          # non-fast-forward and the STATUS.md update is silently dropped
+          # until the next scheduled tick. Uses $GITHUB_REF_NAME so this works
+          # on master-default repos and any branch reached via workflow_dispatch.
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "STATUS.md pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push failed on attempt $attempt — pulling with rebase and retrying."
+            if ! git pull --rebase origin "$GITHUB_REF_NAME"; then
+              echo "Rebase failed (conflict?) — aborting in-progress rebase before next retry."
+              git rebase --abort 2>/dev/null || true
+            fi
+          done
+          echo "::error::Could not push STATUS.md after 5 retries."
+          exit 1
