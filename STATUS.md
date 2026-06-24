@@ -1,8 +1,8 @@
 ---
 repo: lkl-ai/docs
-updated: 2026-06-24T02:52:33Z
+updated: 2026-06-24T20:45:23Z
 branch: main
-commit: f79f788
+commit: c333a6b
 counts:
   open_prs: 0
   open_issues: 0
@@ -14,11 +14,11 @@ counts:
 # Status — lkl-ai/docs
 
 ## Recent commits (last 5 on default branch)
+- `c333a6b` · github-actions[bot] · 2026-06-24 · chore: update STATUS.md [skip ci]
 - `f79f788` · github-actions[bot] · 2026-06-24 · chore: update STATUS.md [skip ci]
 - `fee7b93` · JP · 2026-06-24 · ci: add Repo Status generator (STATUS.md) (#1)
 - `21e2981` · Joshua · 2026-06-11 · update HII deck: rename Eli→Ely, refresh table-stakes statuses
 - `fdd1869` · Joshua · 2026-06-11 · publish LOKAL × HII co-marketing proposal deck
-- `6bb87b6` · JP · 2026-06-10 · publish LOKAL Hotel Marketing Dashboard deck
 
 ## Open pull requests
 _None_
