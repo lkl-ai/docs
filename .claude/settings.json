@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Linear__save_comment",
+      "mcp__Linear__save_issue"
+    ]
+  }
+}
